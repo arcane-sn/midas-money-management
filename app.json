@@ -1,0 +1,55 @@
+{
+  "expo": {
+    "name": "Midas",
+    "slug": "midas-money-management",
+    "version": "1.0.0",
+    "scheme": "midas",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "experiments": {
+      "typedRoutes": false
+    },
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "package": "com.ezrasenaputra.midas",
+      "adaptiveIcon": {
+        "backgroundColor": "#f3f2f2",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "predictiveBackGestureEnabled": false
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-sharing",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/splash-icon.png",
+          "imageWidth": 260,
+          "resizeMode": "contain",
+          "backgroundColor": "#f3f2f2"
+        }
+      ]
+    ],
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "7ff0a079-6e72-4138-b473-4e9480bba33a"
+      }
+    },
+    "owner": "arze123",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/7ff0a079-6e72-4138-b473-4e9480bba33a"
+    }
+  }
+}
