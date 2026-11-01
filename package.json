@@ -1,0 +1,2 @@
+{ "name": "midas", "private": true, "type": "module",
+  "scripts": { "test": "node --test --no-warnings", "start": "node --env-file=.env --no-warnings server.js" } }
