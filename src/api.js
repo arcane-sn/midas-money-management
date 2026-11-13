@@ -3,9 +3,12 @@ import { extname, join, normalize, sep } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { isAuthed, sessionCookie, hasBearer, safeEqual, makeLimiter } from './auth.js'
 import { accountBalance, budgetStatus, totals } from './calc.js'
+import { addCategory, updateCategory, deleteCategory, addSub, updateSub, deleteSub, MSG } from './categories.js'
 import { createCapture, processCapture, defaultRunClaude } from './capture.js'
 
 const PUBLIC = fileURLToPath(new URL('../public/', import.meta.url))
+const MONTH_NAV = fileURLToPath(new URL('./month-nav.js', import.meta.url))
+const MONEY = fileURLToPath(new URL('./money.js', import.meta.url))
 const MIME = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.svg': 'image/svg+xml', '.png': 'image/png', '.json': 'application/json' }
 const RES = {
   groups: ['account_groups', ['name', 'type']],
@@ -38,6 +41,29 @@ export function createApp(db, { token, password, runClaude = defaultRunClaude, d
     res.end(isStr ? body : JSON.stringify(body))
   }
 
+  // Category/sub-category writes go through the validating data layer (empty/duplicate names, move to Uncategorized on delete).
+  async function categoryMutation(req, res, method, id) {
+    const body = method === 'DELETE' ? {} : JSON.parse((await readBody(req, 1e5)).toString() || '{}')
+    const row = id ? db.prepare('select parent_id from categories where id=?').get(id) : null
+    let out
+    if (method === 'POST') {
+      if (body.parent_id) out = addSub(db, Number(body.parent_id), body)
+      else out = addCategory(db, { name: body.name, icon: body.icon, type: body.kind })
+    } else {
+      if (!row) return send(res, 404, { error: MSG.notFound })
+      const isSub = row.parent_id != null
+      if (method === 'PUT') out = isSub ? updateSub(db, Number(id), body) : updateCategory(db, Number(id), body)
+      else if (method === 'DELETE') out = isSub ? deleteSub(db, Number(id)) : deleteCategory(db, Number(id))
+      else return send(res, 405, { error: 'method not allowed' })
+    }
+    if (!out.ok) return send(res, 400, { error: out.error.message, code: out.error.code })
+    const newId = out.category?.id ?? out.sub?.id ?? Number(id)
+    if (method !== 'DELETE' && Number.isInteger(body.monthly_budget) && !isSystemOrSub(newId))
+      db.prepare('update categories set monthly_budget=? where id=?').run(body.monthly_budget, newId)
+    return send(res, method === 'POST' ? 201 : 200, { ok: true, id: newId, movedTransactions: out.movedTransactions })
+  }
+  const isSystemOrSub = cid => { const c = db.prepare('select parent_id, is_system from categories where id=?').get(cid); return !c || c.parent_id != null || c.is_system }
+
   async function api(req, res, url, parts) {
     const [, name, id] = parts, method = req.method
     if (name === 'login' && method === 'POST') {
@@ -64,6 +90,7 @@ export function createApp(db, { token, password, runClaude = defaultRunClaude, d
       return send(res, 200, { month, totals: totals(db), accounts, budgets: budgetStatus(db, month) })
     }
     if (name === 'captures' && method === 'GET') return send(res, 200, db.prepare('select id,created,status,transaction_id from captures order by id desc limit 50').all())
+    if (name === 'categories' && method !== 'GET') return await categoryMutation(req, res, method, id)
     const r = RES[name]
     if (!r) return send(res, 404, { error: 'not found' })
     const [table, cols] = r
@@ -96,6 +123,8 @@ export function createApp(db, { token, password, runClaude = defaultRunClaude, d
   }
 
   function serveStatic(res, pathname) {
+    if (pathname === '/month-nav.js') return send(res, 200, readFileSync(MONTH_NAV), { 'content-type': MIME['.js'] })
+    if (pathname === '/money.js') return send(res, 200, readFileSync(MONEY), { 'content-type': MIME['.js'] })
     const rel = normalize(decodeURIComponent(pathname === '/' ? '/index.html' : pathname))
     const file = join(PUBLIC, rel)
     if (rel.includes('..') || !file.startsWith(PUBLIC.endsWith(sep) ? PUBLIC : PUBLIC + sep) || !existsSync(file) || !statSync(file).isFile()) return send(res, 404, 'not found')

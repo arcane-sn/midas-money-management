@@ -3,14 +3,19 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#222429">
+<meta name="theme-color" content="#f6f5ef">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <title>MIDAS</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23222429'/%3E%3Ccircle cx='16' cy='16' r='9' fill='%23f5b301'/%3E%3Ctext x='16' y='20.5' font-size='12' font-family='sans-serif' font-weight='700' text-anchor='middle' fill='%23222429'%3EM%3C/text%3E%3C/svg%3E">
 <style>
-:root{--bg:#222429;--card:#2a2c32;--line:#33363c;--txt:#e8e8ea;--mut:#8b8f98;--red:#ff6150;--blue:#4a90e2;--amb:#f5a623}
+:root{--color-primary:#1e5a43;--color-bg:#f6f5ef;--color-neutral:#6f7a73;--layout-width:440px;
+--bg:var(--color-bg);--card:#fff;--line:#e4e2d8;--line2:#d6d4c8;--sec:#edebe2;--txt:#16211c;--txt2:#4a504b;--mut:var(--color-neutral);--red:#c0392b;--blue:var(--color-primary);--amb:#c98a0b}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--txt);font:15px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;-webkit-text-size-adjust:100%}
-#app{max-width:480px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column}
+body{margin:0;background:var(--color-bg);color:var(--txt);font:15px 'Plus Jakarta Sans',sans-serif;font-variant-numeric:tabular-nums;-webkit-text-size-adjust:100%}
+button,input,select,.num,.amt,time{font-family:inherit;font-variant-numeric:tabular-nums}
+#app{max-width:var(--layout-width);margin:0 auto;overflow-x:hidden;min-height:100vh;display:flex;flex-direction:column}
 header{padding:14px 14px 8px;text-align:center;font-weight:600;font-size:17px;position:sticky;top:0;background:var(--bg);z-index:2}
 main{flex:1;padding-bottom:90px}
 button,input,select{font:inherit;color:inherit}
@@ -20,38 +25,81 @@ button{background:none;border:0;cursor:pointer;padding:0}
 .mnav button{font-size:22px;padding:2px 14px}
 .sum{display:flex;justify-content:space-around;padding:10px 0;border-block:1px solid var(--line);text-align:center;color:var(--mut);font-size:12px}
 .sum b{display:block;font-size:14px;margin-top:3px}
-.day{background:var(--card);padding:6px 14px;display:flex;justify-content:space-between;color:var(--mut);font-size:12px}
-.row{display:flex;gap:10px;align-items:center;padding:11px 14px;border-bottom:1px solid #2e3036;width:100%;text-align:left}
-.row .c{width:96px;color:var(--mut);font-size:12px;flex:none}
-.row .n{flex:1;min-width:0}.row .n small{display:block;color:var(--mut);font-size:11px}
-.row .n span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block}
-.badge{background:#ff615033;color:#ff9a8d;border-radius:4px;font-size:10px;padding:1px 5px;margin-left:4px}
-.badge.r{background:#f5a62333;color:var(--amb)}
-.fab{position:fixed;right:max(14px,calc(50% - 226px));bottom:calc(70px + env(safe-area-inset-bottom));width:52px;height:52px;border-radius:50%;background:var(--red);font-size:30px;color:#fff;box-shadow:0 4px 14px #0008;z-index:3}
+.scard{margin:8px 20px 12px;padding:20px;border-radius:24px;background:var(--color-primary);color:#fff;position:relative;overflow:hidden}
+.scard:before{content:"";position:absolute;right:-60px;top:-60px;width:200px;height:200px;border-radius:50%;background:radial-gradient(circle,#ffffff1a 0 40%,#ffffff0d 40% 70%,transparent 70%)}
+.scard>*{position:relative}
+.scard .top{display:flex;align-items:center;justify-content:space-between}
+.scard .ttl{font-size:13px;opacity:.8}
+.scard .pn{display:flex;align-items:center;gap:2px;background:#ffffff1f;border-radius:999px;padding:2px}
+.scard .pn button{width:28px;height:28px;border-radius:50%;color:#fff;display:flex;align-items:center;justify-content:center}
+.scard .pn button:disabled{opacity:.35;cursor:not-allowed}
+.scard .pn svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round}
+.scard .pn span{font-size:12px;font-weight:600;min-width:64px;text-align:center}
+.scard .big{font-size:34px;font-weight:800;letter-spacing:-.02em;margin-top:10px}
+.scard .big small{font-size:18px;font-weight:600;opacity:.75;margin-right:6px}
+.scard .two{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:16px}
+.scard .two div{background:#ffffff1f;border-radius:16px;padding:10px 12px;font-size:11px}
+.scard .two div span{opacity:.75}
+.scard .two b{display:block;font-size:15px;margin-top:2px}
+.dayw{padding:0 20px}
+.day{display:flex;justify-content:space-between;align-items:baseline;padding:20px 4px 10px;font-size:14px;font-weight:700}
+.day span+span{font-size:13px;font-weight:400;color:var(--mut)}
+.dcard{background:#fff;border-radius:20px;padding:4px 16px;box-shadow:0 1px 2px rgba(22,33,28,.04)}
+.row{display:grid;grid-template-columns:44px minmax(0,1fr) auto;gap:12px;align-items:center;padding:12px 0;border-top:1px solid var(--line);width:100%;text-align:left}
+.row:first-child{border-top:0}
+.row .ico{width:44px;height:44px;border-radius:50%;background:#e4f1e9;color:#1e5a43;display:flex;align-items:center;justify-content:center;font-weight:700}
+.row .n{min-width:0}
+.row .n>span{display:block;font-size:14px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.row .n small{display:flex;align-items:center;gap:6px;margin-top:3px;color:var(--mut);font-size:12px;min-width:0}
+.row .n small i{font-style:normal;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.row .amt{text-align:right}.row .amt b{display:block;font-size:14px;font-weight:700;white-space:nowrap}
+.row .amt small{display:block;font-size:11px;color:#9aa39d;margin-top:3px}
+.badge{flex:none;background:#eceee9;color:var(--mut);border-radius:999px;font-size:11px;font-weight:600;padding:1px 8px}
+.badge.r{background:#fdf1dc;color:#8a5b14}
+.fab{position:fixed;right:max(14px,calc(50% - 206px));bottom:calc(70px + env(safe-area-inset-bottom));width:52px;height:52px;border-radius:50%;background:var(--red);font-size:30px;color:#fff;box-shadow:0 4px 14px #0008;z-index:3}
 nav{position:fixed;bottom:0;left:0;right:0;z-index:3;background:var(--bg);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom)}
-nav div{max-width:480px;margin:0 auto;display:flex}
+nav div{max-width:var(--layout-width);margin:0 auto;display:flex}
 nav button{flex:1;padding:9px 0 8px;color:var(--mut);font-size:11px}
 nav button.on{color:var(--red)}nav button i{display:block;font-style:normal;font-size:19px}
 .seg{display:flex;gap:8px;padding:8px 14px}
-.seg button{flex:1;border:1px solid #3a3d44;border-radius:7px;padding:8px 0;color:var(--mut)}
+.seg button{flex:1;border:1px solid var(--line2);border-radius:7px;padding:8px 0;color:var(--mut)}
 .seg button.on{border-color:var(--red);color:var(--red)}
 .tabs{display:flex;border-bottom:1px solid var(--line)}
 .tabs button{flex:1;padding:10px 0;color:var(--mut)}.tabs button.on{color:var(--txt);border-bottom:2px solid var(--red)}
+.accts-v2{padding:0 20px;max-width:100%;overflow-x:hidden}
+.accts-title{margin:0;padding:24px 0 8px;font-size:26px;font-weight:800;letter-spacing:-.02em}
+.accts-list{min-width:0}
+.acct-item{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:16px;margin-top:10px;background:#fff;border-radius:16px}
+.acct-name{min-width:0;font-size:14px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.acct-bal{font-size:14px;font-weight:700;white-space:nowrap}
 .grp{background:var(--card);padding:7px 14px;display:flex;justify-content:space-between;color:var(--mut);font-size:13px}
-.bar{height:6px;border-radius:3px;background:#3a3d44;margin-top:6px;overflow:hidden}.bar i{display:block;height:100%;background:var(--blue)}
+.bar{height:6px;border-radius:3px;background:var(--line2);margin-top:6px;overflow:hidden}.bar i{display:block;height:100%;background:var(--blue)}
 .bar i.w{background:var(--amb)}.bar i.d{background:var(--red)}
-.bud{padding:11px 14px;border-bottom:1px solid #2e3036}.bud>div:first-child{display:flex;justify-content:space-between}
+.bud{padding:11px 14px;border-bottom:1px solid var(--line)}.bud>div:first-child{display:flex;justify-content:space-between}
 .empty{text-align:center;color:var(--mut);padding:60px 20px}
-.sec{padding:9px 14px;background:#1c1e22;color:var(--mut);font-size:12px;display:flex;justify-content:space-between}
+.tempty{margin:16px 20px;padding:32px 20px;border-radius:20px;background:#fff;text-align:center;color:#6f7a73;font-size:14px}
+.v2-head{display:flex;align-items:center;gap:12px;padding:24px 0 8px}
+.v2-head .back{width:44px;height:44px;border-radius:50%;border:1px solid #ecebe4;background:#fff;display:flex;align-items:center;justify-content:center;color:#16211c;flex:none}
+.v2-head .ttl{flex:1;font-size:20px;font-weight:700;letter-spacing:-.01em}
+.v2-head .add{height:44px;padding:0 16px;border-radius:999px;background:#1e5a43;color:#fff;font-size:14px;font-weight:600}
+.rec-empty{margin:16px 0 0;padding:32px 24px;border-radius:24px;background:#fff;display:flex;flex-direction:column;align-items:center;text-align:center}
+.rec-empty .ico{width:72px;height:72px;border-radius:50%;background:#e4f1e9;color:#1e5a43;display:flex;align-items:center;justify-content:center}
+.rec-empty .t{font-size:18px;font-weight:700;margin-top:16px}
+.rec-empty .d{font-size:14px;color:#6f7a73;margin-top:6px;max-width:280px;text-wrap:pretty}
+.rec-empty button{margin-top:20px;height:48px;padding:0 24px;border-radius:999px;background:#1e5a43;color:#fff;font-size:14px;font-weight:600}
+.sec{padding:9px 14px;background:var(--sec);color:var(--mut);font-size:12px;display:flex;justify-content:space-between}
 .sec button{color:var(--red)}
-.sub{padding-left:32px;color:#c3c5ca}
-.mi{display:flex;justify-content:space-between;width:100%;padding:14px;border-bottom:1px solid #2e3036;text-align:left}
+.sub{padding-left:32px;color:var(--txt2)}
+.mi{display:flex;justify-content:space-between;width:100%;padding:14px;border-bottom:1px solid var(--line);text-align:left}
+.mi.g{display:grid;grid-template-columns:44px 1fr 20px;align-items:center;gap:12px}
+.mi .ic{width:44px;height:44px;border-radius:50%;background:#e4f1e9;display:flex;align-items:center;justify-content:center}
+.mi .tt{display:flex;flex-direction:column;gap:2px}
 #fm{position:fixed;inset:0;background:var(--bg);z-index:10;overflow:auto}
-#fm .in-wrap{max-width:480px;margin:0 auto;padding-bottom:40px}
+#fm .in-wrap{max-width:var(--layout-width);margin:0 auto;padding-bottom:40px}
 .f{display:flex;align-items:center;padding:6px 14px;border-bottom:1px solid var(--line);min-height:50px}
 .f label{width:84px;color:var(--mut);flex:none}
-.f input,.f select{flex:1;background:none;border:0;outline:0;min-width:0;padding:8px 0;color-scheme:dark}
-.f select option{background:#2a2c32}
+.f input,.f select{flex:1;background:none;border:0;outline:0;min-width:0;padding:8px 0;color-scheme:light}
+.f select option{background:var(--card)}
 .f.amt{border-bottom-color:var(--red)}.f.amt input{font-size:20px;font-weight:600}
 .hint{padding:10px 14px;color:var(--mut);font-size:13px;min-height:38px}
 .acts{display:flex;gap:10px;padding:14px}
@@ -59,7 +107,7 @@ nav button.on{color:var(--red)}nav button i{display:block;font-style:normal;font
 .acts .pri{background:var(--red);color:#fff;font-weight:600}.acts .danger{color:var(--red)}
 #ov{position:fixed;inset:0;background:#000a;z-index:20;display:flex;align-items:flex-end;justify-content:center}
 #ov[hidden]{display:none}
-.sheet{width:100%;max-width:480px;background:var(--card);border-radius:16px 16px 0 0;padding:16px 16px calc(16px + env(safe-area-inset-bottom));max-height:90vh;overflow:auto}
+.sheet{width:100%;max-width:var(--layout-width);background:var(--card);border-radius:16px 16px 0 0;padding:16px 16px calc(16px + env(safe-area-inset-bottom));max-height:90vh;overflow:auto}
 .sheet h3{margin:0 0 10px}.sheet label{display:block;color:var(--mut);font-size:12px;margin-top:10px}
 .sheet input,.sheet select{width:100%;margin-top:4px;padding:11px;background:var(--bg);border:1px solid var(--line);border-radius:8px;color:var(--txt)}
 .sheet .btns{display:flex;gap:8px;margin-top:16px}.sheet .btns button{flex:1;padding:12px;border-radius:9px;background:var(--bg)}
@@ -67,12 +115,33 @@ nav button.on{color:var(--red)}nav button i{display:block;font-style:normal;font
 .login{padding:90px 24px;text-align:center}.login input{width:100%;padding:13px;margin:14px 0;background:var(--card);border:1px solid var(--line);border-radius:9px}
 .login button{width:100%;padding:13px;border-radius:9px;background:var(--red);color:#fff;font-weight:600}
 .err{color:var(--red);min-height:20px}
+#bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);right:auto;width:100%;max-width:var(--layout-width);z-index:3;background:var(--color-bg);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom)}
+#bottom-nav .bn-inner{max-width:none;margin:0;display:flex;align-items:center;padding:0 4px}
+#bottom-nav .bn-tab{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 0 7px;color:var(--color-neutral);font-size:11px;font-weight:500}
+#bottom-nav .bn-tab svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+#bottom-nav .bn-tab.active{color:var(--color-primary);font-weight:700}
+#bottom-nav .bn-new{flex:none;width:52px;height:52px;margin:-18px 6px 0;border-radius:50%;background:var(--color-primary);color:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px #1e5a4355}
+#bottom-nav .bn-new svg{width:26px;height:26px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round}
+#bottom-nav.hidden{display:none}
 </style>
 </head>
 <body>
-<div id="app"></div><div id="fm" hidden></div><div id="ov" hidden></div>
-<script>
-const $ = (s, r = document) => r.querySelector(s)
+<div id="app"></div>
+<nav id="bottom-nav" aria-label="Navigasi utama"><div class="bn-inner">
+<button class="bn-tab active" data-tab="ledger"><svg viewBox="0 0 24 24"><path d="M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3z"/><path d="M9 9h6M9 13h6"/></svg><span>Ledger</span></button>
+<button class="bn-tab" data-tab="insights"><svg viewBox="0 0 24 24"><path d="M5 20V11M12 20V5M19 20v-6"/></svg><span>Insights</span></button>
+<button class="bn-new" data-a="new-tx" aria-label="New transaction"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button>
+<button class="bn-tab" data-tab="accounts"><svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="3"/><path d="M3 10h18M16 14.5h2"/></svg><span>Accounts</span></button>
+<button class="bn-tab" data-tab="more"><svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.2"/><circle cx="12" cy="12" r="1.2"/><circle cx="19" cy="12" r="1.2"/></svg><span>More</span></button>
+</div></nav>
+<div id="fm" hidden></div><div id="ov" hidden></div>
+<script src="category-icons.js"></script>
+<script src="category-picker.js"></script>
+<script src="categories-view.js"></script>
+<script type="module">
+import { shiftMonth, canGoNext, formatMonthLabel } from '/month-nav.js'
+import { fmtRupiah } from '/money.js'
+const $ =(s, r = document) => r.querySelector(s)
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]))
 const fmt = n => new Intl.NumberFormat('id-ID').format(n)
 const today = () => new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Jakarta' }).format(new Date())
@@ -94,92 +163,232 @@ function showLogin(msg = '') {
   }
 }
 
-const load = guard(async () => {
-  ;[S.sum, S.cats, S.groups, S.txs, S.rec] = await Promise.all([api('GET', 'summary?month=' + S.month), api('GET', 'categories'), api('GET', 'groups'), api('GET', 'transactions?month=' + S.month), api('GET', 'recurring')])
-  S.accts = S.sum.accounts; render()
-})
+let loadSeq = 0
+async function load() {
+  const my = ++loadSeq
+  // Jangan pernah menampilkan data bulan lain di bawah bulan yang baru dipilih.
+  S.status = 'loading'; S.txs = []
+  render()
+  try {
+    const [sum, cats, groups, txs, rec] = await Promise.all([api('GET', 'summary?month=' + S.month), api('GET', 'categories'), api('GET', 'groups'), api('GET', 'transactions?month=' + S.month), api('GET', 'recurring')])
+    if (my !== loadSeq) return
+    ;[S.sum, S.cats, S.groups, S.txs, S.rec] = [sum, cats, groups, txs, rec]
+    S.accts = S.sum.accounts; S.status = 'ready'; render()
+  } catch (e) {
+    if (my !== loadSeq || e.message === 'auth') return
+    S.status = 'error'; S.error = e.message; render()
+  }
+}
+
+function vState() {
+  const bar = S.tab === 'trans' ? spentCard(true) : ''
+  const cls = S.tab === 'trans' ? 'tempty' : 'empty'
+  if (S.status === 'loading') return bar + `<div class="${cls}" role="status">Memuat…</div>`
+  return bar + `<div class="${cls}" role="alert">Gagal memuat data${S.error ? ': ' + esc(S.error) : ''}<br><button data-a="retry">Coba lagi</button></div>`
+}
 
 const cat = id => S.cats.find(c => c.id === id)
 const catName = id => { const c = cat(id); if (!c) return '—'; const p = cat(c.parent_id); return p ? `${p.name} › ${c.name}` : c.name }
 const acc = id => S.accts.find(a => a.id === id)?.name ?? '?'
 const family = id => { const c = cat(id); return c ? (c.parent_id ?? c.id) : null }
 const monthLabel = m => new Date(m + '-01T00:00:00').toLocaleDateString('id-ID', { month: 'short', year: 'numeric' })
-const shiftMonth = (m, d) => { const [y, mo] = m.split('-').map(Number), t = new Date(y, mo - 1 + d, 1); return `${t.getFullYear()}-${String(t.getMonth() + 1).padStart(2, '0')}` }
 const sign = { income: 'in', expense: 'ex', transfer: '' }
 
 function render() {
   const titles = { trans: 'Trans.', stats: 'Stats', accts: 'Accounts', more: 'Settings' }
-  const body = { trans: vTrans, stats: vStats, accts: vAccts, more: vMore }[S.tab]()
-  const nav = [['trans', '📒', 'Trans.'], ['stats', '📊', 'Stats'], ['accts', '🪙', 'Accounts'], ['more', '⋯', 'More']]
-    .map(([k, i, l]) => `<button data-a="tab" data-v="${k}" class="${S.tab === k ? 'on' : ''}"><i>${i}</i>${l}</button>`).join('')
-  $('#app').innerHTML = `<header>${titles[S.tab]}</header><main>${body}</main>${S.tab === 'trans' ? '<button class="fab" data-a="add" aria-label="Tambah">+</button>' : ''}<nav><div>${nav}</div></nav>`
+  const body = S.status !== 'ready' ? vState() : ({ trans: vTrans, stats: vStats, accts: vAccts, more: vMore }[S.tab] || vPlaceholder)()
+  document.querySelectorAll('#bottom-nav .bn-tab').forEach(b => b.classList.toggle('active', TAB_MAP[b.dataset.tab] === S.tab))
+  $('#app').innerHTML = `<header>${titles[S.tab] ?? ''}</header><main>${body}</main>${S.tab === 'trans' ? '<button class="fab" data-a="add" aria-label="Tambah">+</button>' : ''}`
 }
 
-const monthBar = () => `<div class="mnav"><button data-a="mon" data-v="-1" aria-label="Bulan lalu">‹</button><b>${monthLabel(S.month)}</b><button data-a="mon" data-v="1" aria-label="Bulan depan">›</button></div>`
+// bottom-nav tab -> layar (S.tab); layar yang belum ada jatuh ke placeholder
+const TAB_MAP = { ledger: 'trans', insights: 'stats', accounts: 'accts', more: 'more' }
+const vPlaceholder = () => '<div class="empty">Segera hadir</div>'
+$('#bottom-nav').onclick = e => {
+  if (e.target.closest('.bn-new')) {
+    if (!S.sum || S.status !== 'ready') return
+    S.previousTab = S.tab; $('#bottom-nav').classList.add('hidden'); txNew(); return
+  }
+  const b = e.target.closest('.bn-tab'); if (!b || !TAB_MAP[b.dataset.tab]) return
+  S.tab = TAB_MAP[b.dataset.tab]; S.sub = null
+  if (S.status) render(); else document.querySelectorAll('#bottom-nav .bn-tab').forEach(x => x.classList.toggle('active', x === b))
+  if (S.tab === 'accts' && S.status === 'ready') refreshAccts()
+}
+
+const monthBar = () => `<div class="mnav"><button data-a="mon" data-v="-1" aria-label="Bulan lalu">‹</button><b>${formatMonthLabel(S.month)}</b><button data-a="mon" data-v="1" aria-label="Bulan depan"${canGoNext(S.month, today().slice(0, 7)) ? '' : ' disabled'}>›</button></div>`
 const sumOf = kind => S.txs.filter(t => t.kind === kind).reduce((s, t) => s + t.amount, 0)
 
+const monthLong = m => new Date(m + '-01T00:00:00').toLocaleDateString('id-ID', { month: 'long' })
+function spentCard(pending) {
+  const inc = sumOf('income'), exp = sumOf('expense'), net = inc - exp
+  const canNext = S.month < today().slice(0, 7)
+  return `<div class="scard"><div class="top"><span class="ttl">Spent in ${esc(monthLong(S.month))}</span><div class="pn">` +
+    `<button data-a="mon" data-v="-1" aria-label="Bulan lalu"><svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></button>` +
+    `<span>${esc(monthLabel(S.month))}</span>` +
+    `<button data-a="mon" data-v="1" aria-label="Bulan depan"${canNext ? '' : ' disabled'}><svg viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></button></div></div>` +
+    `<div class="big num"><small>Rp</small>${pending ? '—' : fmt(exp)}</div>` +
+    `<div class="two"><div><span>Income</span><b class="num">${pending ? '—' : fmt(inc)}</b></div><div><span>Net</span><b class="num">${pending ? '—' : (net < 0 ? '−' : '') + fmt(Math.abs(net))}</b></div></div></div>`
+}
+
 function vTrans() {
-  const inc = sumOf('income'), exp = sumOf('expense')
-  let html = monthBar() + `<div class="sum"><div>Income<b class="in">${fmt(inc)}</b></div><div>Exp.<b class="ex">${fmt(exp)}</b></div><div>Total<b>${fmt(inc - exp)}</b></div></div>`
-  if (!S.txs.length) return html + '<div class="empty">Belum ada transaksi bulan ini</div>'
-  let last = ''
+  let html = spentCard()
+  if (!S.txs.length) return html + `<div class="tempty">No transactions in ${esc(monthLabel(S.month))}.</div>`
+  let last = '', open = false
   for (const t of S.txs) {
     if (t.date !== last) {
-      last = t.date; const day = S.txs.filter(x => x.date === t.date)
+      if (open) html += '</div></div>'
+      last = t.date; open = true; const day = S.txs.filter(x => x.date === t.date)
       const net = day.reduce((s, x) => s + (x.kind === 'income' ? x.amount : x.kind === 'expense' ? -x.amount : 0), 0)
-      html += `<div class="day"><span>${new Date(t.date + 'T00:00:00').toLocaleDateString('id-ID', { day: 'numeric', month: 'short', weekday: 'short' })}</span><span class="${net < 0 ? 'ex' : net > 0 ? 'in' : ''}">${fmt(Math.abs(net))}</span></div>`
+      html += `<div class="dayw"><div class="day"><span>${new Date(t.date + 'T00:00:00').toLocaleDateString('id-ID', { day: 'numeric', month: 'short', weekday: 'short' })}</span><span class="num">${net < 0 ? '−' : ''}${fmt(Math.abs(net))}</span></div><div class="dcard">`
     }
-    const left = t.kind === 'transfer' ? 'Transfer' : esc(catName(t.category_id))
+    const c = cat(t.category_id), parent = cat(c?.parent_id)
+    const top = t.kind === 'transfer' ? 'Transfer' : (parent?.name ?? c?.name ?? '—')
+    const sub = t.kind === 'transfer' || !parent ? '' : c.name
     const acct = t.kind === 'transfer' ? `${esc(acc(t.account_id))} → ${esc(acc(t.to_account_id))}` : esc(acc(t.account_id))
-    html += `<button class="row" data-a="edit" data-id="${t.id}"><div class="c">${left}</div><div class="n"><span>${esc(t.note) || '&nbsp;'}${t.source !== 'manual' ? `<span class="badge" style="display:inline">${t.source === 'auto' ? 'auto' : 'rutin'}</span>` : ''}${t.flag === 'review' ? '<span class="badge r" style="display:inline">cek</span>' : ''}</span><small>${acct}</small></div><div class="${sign[t.kind]}">${fmt(t.amount)}</div></button>`
+    const mark = t.flag === 'review' ? '<span class="badge r">Review</span>' : t.source === 'auto' ? '<span class="badge">Auto</span>' : ''
+    html += `<div class="row"><div class="ico" aria-hidden="true">${categoryIcon(top)}</div><div class="n"><span>${esc(sub || top)}</span><small>${sub ? `<i>${esc(top)}</i>` : ''}${mark}</small></div><div class="amt"><b class="${sign[t.kind]}">${fmt(t.amount)}</b><small>${acct}</small></div></div>`
   }
+  if (open) html += '</div></div>'
   return html
 }
 
 function vStats() {
   let html = `<div class="seg"><button data-a="sTab" data-v="stats" class="${S.sTab === 'stats' ? 'on' : ''}">Stats</button><button data-a="sTab" data-v="budget" class="${S.sTab === 'budget' ? 'on' : ''}">Budget</button></div>` + monthBar()
-  if (S.sTab === 'budget') {
-    const b = S.sum.budgets
-    return html + (b.length ? b.map(x => {
-      const pct = x.budget ? Math.min(100, Math.round(x.used / x.budget * 100)) : 0, cls = x.budget && x.used > x.budget ? 'd' : pct >= 80 ? 'w' : ''
-      return `<div class="bud"><div><span>${esc(x.name)}</span><span class="${cls === 'd' ? 'ex' : ''}">${fmt(x.used)} / ${x.budget ? fmt(x.budget) : '—'}</span></div><div class="bar"><i class="${cls}" style="width:${pct}%"></i></div></div>`
-    }).join('') : '<div class="empty">Belum ada kategori</div>')
+  // Budget: placeholder saja (isi dikerjakan di tiket terpisah); S.month dibagikan antar tab
+  if (S.sTab === 'budget') return html + '<div class="empty">Budget segera hadir</div>'
+  return html + vStatsBody()
+}
+
+// Slot isi tab Stats (diisi/diganti oleh tugas berikutnya)
+function vStatsBody() {
+  const section = (kind, title) => {
+    const by = new Map(); let total = 0
+    for (const t of S.txs.filter(t => t.kind === kind)) { const k = family(t.category_id); by.set(k, (by.get(k) ?? 0) + t.amount); total += t.amount }
+    if (!by.size) return null
+    const rows = [...by].map(([k, v]) => [cat(k)?.name ?? 'Tanpa kategori', v]).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+    return `<div class="sec"><span>${title}</span><span class="num">${fmt(total)}</span></div>` + rows.map(([name, v]) =>
+      `<div class="bud"><div><span>${esc(name)}</span><span class="num">${fmt(v)} · ${total > 0 ? Math.round(v / total * 100) : 0}%</span></div><div class="bar"><i class="${kind === 'expense' ? 'd' : ''}" style="width:${total > 0 ? v / total * 100 : 0}%"></i></div></div>`).join('')
   }
-  html += `<div class="tabs"><button data-a="sKind" data-v="income" class="${S.sKind === 'income' ? 'on' : ''}">Income</button><button data-a="sKind" data-v="expense" class="${S.sKind === 'expense' ? 'on' : ''}">Exp.</button></div>`
-  const by = new Map(); let total = 0
-  for (const t of S.txs.filter(t => t.kind === S.sKind)) { const k = family(t.category_id); by.set(k, (by.get(k) ?? 0) + t.amount); total += t.amount }
-  if (!total) return html + '<div class="empty">Belum ada data</div>'
-  return html + [...by].sort((a, b) => b[1] - a[1]).map(([k, v]) => `<div class="bud"><div><span>${esc(cat(k)?.name ?? 'Tanpa kategori')}</span><span>${fmt(v)} · ${Math.round(v / total * 100)}%</span></div><div class="bar"><i class="${S.sKind === 'expense' ? 'd' : ''}" style="width:${v / total * 100}%"></i></div></div>`).join('')
+  const parts = [section('expense', 'Pengeluaran'), section('income', 'Pemasukan')].filter(Boolean)
+  // noStats: tidak ada pengeluaran maupun pemasukan di bulan terpilih
+  if (!parts.length) return '<div class="empty">Nothing recorded this month.</div>'
+  return parts.join('')
 }
 
 function vAccts() {
+  let list
+  if (S.acctsErr) list = `<div class="empty" role="alert">Gagal memuat akun<br><button data-a="acctsRetry">Coba lagi</button></div>`
+  else if (!S.accts.length) list = '<div class="empty">Belum ada akun.</div>'
+  else list = S.accts.map(a => `<div class="acct-item"><span class="acct-name">${esc(a.name)}</span><b class="num acct-bal ${a.balance < 0 ? 'ex' : ''}">${fmtRupiah(a.balance)}</b></div>`).join('')
+  return `<section class="accts-v2" aria-label="Accounts"><h1 class="accts-title">Accounts</h1><div class="accts-list" id="accts-list">${list}</div><button class="fab" data-a="acctAddV2" aria-label="Tambah akun">+</button></section>`
+}
+
+// Tombol tambah akun: sengaja tidak melakukan apa pun.
+// Aksinya (membuka bottom sheet akun) dikerjakan di tiket bottom sheet akun.
+// Dipanggil lewat A.acctAddV2 agar handler #app tidak error.
+function onAcctAddV2() {}
+
+// Ambil ulang data akun dari GET /api/summary setiap layar Accounts dibuka (tanpa cache)
+let acctsSeq = 0
+async function refreshAccts() {
+  const my = ++acctsSeq
+  try {
+    const sum = await api('GET', 'summary?month=' + S.month)
+    if (my !== acctsSeq) return
+    S.sum = sum; S.accts = sum.accounts; S.acctsErr = false
+  } catch (e) {
+    if (my !== acctsSeq || e.message === 'auth') return
+    S.acctsErr = true
+  }
+  if (S.tab === 'accts' && S.status === 'ready') render()
+}
+document.addEventListener('click', e => { if (e.target.closest('[data-a="acctsRetry"]')) refreshAccts() })
+
+function vAcctsLegacy() {
   const t = S.sum.totals
-  let html = `<div class="sum"><div>Assets<b class="in">${fmt(t.assets)}</b></div><div>Liabilities<b class="ex">${fmt(t.liabilities)}</b></div><div>Total<b>${fmt(t.total)}</b></div></div>`
+  let html = `<div class="sum"><div>Assets<b class="num in">${fmt(t.assets)}</b></div><div>Liabilities<b class="num ex">${fmt(t.liabilities)}</b></div><div>Total<b class="num">${fmt(t.total)}</b></div></div>`
   const groups = [...S.groups, { id: null, name: 'Lainnya', type: 'asset' }]
   for (const g of groups) {
     const list = S.accts.filter(a => (a.group_id ?? null) === g.id); if (!list.length) continue
     const gs = list.reduce((s, a) => s + a.balance, 0)
-    html += `<div class="grp"><span>${esc(g.name)} · ${g.type === 'asset' ? 'Asset' : 'Liability'}</span><span class="${gs < 0 ? 'ex' : 'in'}">${fmt(gs)}</span></div>` +
-      list.map(a => `<div class="row"><div class="n">${esc(a.name)}</div><div class="${a.balance < 0 ? 'ex' : 'in'}">${fmt(a.balance)}</div></div>`).join('')
+    html += `<div class="grp"><span>${esc(g.name)} · ${g.type === 'asset' ? 'Asset' : 'Liability'}</span><span class="num ${gs < 0 ? 'ex' : 'in'}">${fmt(gs)}</span></div>` +
+      list.map(a => `<div class="row"><div class="n">${esc(a.name)}</div><div class="num ${a.balance < 0 ? 'ex' : 'in'}">${fmt(a.balance)}</div></div>`).join('')
   }
   return html + (S.accts.length ? '' : '<div class="empty">Belum ada account — tambah di More › Accounts</div>')
 }
 
+// Layar Groups v2: daftar grup (nama + tipe) dari GET /api/groups
+function vGroups() {
+  let list
+  if (S.groupsErr) list = `<div class="empty" role="alert">Gagal memuat grup<br><button data-a="groupsRetry">Coba lagi</button></div>`
+  else if (S.groupsLoading && !S.groups.length) list = '<div class="empty" role="status">Memuat…</div>'
+  else if (!S.groups.length) list = '<div class="empty">Belum ada grup.</div>'
+  else list = S.groups.map(g => `<div class="acct-item" role="button" tabindex="0" data-a="grpEdit" data-id="${g.id}"><span class="acct-name">${esc(g.name)}</span><span class="badge${g.type === 'liability' ? ' r' : ''}">${g.type === 'liability' ? 'Liability' : 'Asset'}</span></div>`).join('')
+  return `<section class="accts-v2" aria-label="Groups"><div class="sec" style="margin:0 -20px"><button data-a="back">‹ Back</button><button data-a="grpAdd">+ Group</button></div><h1 class="accts-title">Groups</h1><div class="accts-list">${list}</div></section>`
+}
+
+// Ambil ulang daftar grup setiap layar Groups dibuka (tanpa cache)
+let groupsSeq = 0
+async function refreshGroups() {
+  const my = ++groupsSeq
+  S.groupsLoading = true; S.groupsErr = false
+  if (S.sub === 'groups' && S.status === 'ready') render()
+  try {
+    const g = await api('GET', 'groups')
+    if (my !== groupsSeq) return
+    S.groups = g
+  } catch (e) {
+    if (my !== groupsSeq || e.message === 'auth') return
+    S.groupsErr = true
+  }
+  S.groupsLoading = false
+  if (S.sub === 'groups' && S.status === 'ready') render()
+}
+document.addEventListener('click', e => { if (e.target.closest('[data-a="groupsRetry"]')) refreshGroups() })
+
+// Layar Recurring v2: daftar transaksi berulang dari GET /api/recurring
+function vRecurring() {
+  let list
+  if (S.recErr) list = `<div class="empty" role="alert">Gagal memuat recurring<br><button data-a="recRetry">Coba lagi</button></div>`
+  else if (S.recLoading && !S.rec.length) list = '<div class="empty" role="status">Memuat…</div>'
+  else if (!S.rec.length) list = '<div class="rec-empty"><span class="ico"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="m17 2 4 4-4 4"></path><path d="M3 11v-1a4 4 0 0 1 4-4h14"></path><path d="m7 22-4-4 4-4"></path><path d="M21 13v1a4 4 0 0 1-4 4H3"></path></svg></span><div class="t">No recurring transactions yet</div><div class="d">Add installments and subscriptions once. They’re created automatically each month.</div><button data-a="recAdd">+ Add recurring</button></div>'
+  else list = S.rec.map(r => `<div class="acct-item" role="button" tabindex="0" data-a="recEdit" data-id="${r.id}"><span style="min-width:0"><b>${esc(r.note || '—')}</b><br><span class="mut">${esc(acc(r.account_id))} · ${esc(catName(r.category_id))}<br>Tiap tgl ${esc(r.day_of_month)} · Last run: ${r.last_run ? esc(r.last_run) : '—'}</span></span><span style="text-align:right"><b class="num ${r.kind === 'income' ? 'in' : 'ex'}">${r.kind === 'income' ? '+' : '−'}${fmt(r.amount)}</b><br><span class="badge${r.active ? '' : ' r'}">${r.active ? 'Aktif' : 'Nonaktif'}</span> <span class="badge">${r.kind === 'income' ? 'Income' : 'Expense'}</span></span></div>`).join('')
+  return `<section class="accts-v2" aria-label="Recurring"><div class="v2-head"><button class="back" data-a="back" aria-label="Back"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"></path><path d="M19 12H5"></path></svg></button><h1 class="ttl">Recurring &amp; Auto Debit</h1>${S.rec.length ? '<button class="add" data-a="recAdd">+ Recurring</button>' : ''}</div><div class="accts-list">${list}</div></section>`
+}
+
+let recSeq = 0
+async function refreshRecurring() {
+  const my = ++recSeq
+  S.recLoading = true; S.recErr = false
+  if (S.sub === 'recurring' && S.status === 'ready') render()
+  try {
+    const r = await api('GET', 'recurring')
+    if (my !== recSeq) return
+    S.rec = r
+  } catch (e) {
+    if (my !== recSeq || e.message === 'auth') return
+    S.recErr = true
+  }
+  S.recLoading = false
+  if (S.sub === 'recurring' && S.status === 'ready') render()
+}
+document.addEventListener('click', e => { if (e.target.closest('[data-a="recRetry"]')) refreshRecurring() })
+
 function vMore() {
-  if (S.sub === 'cats') return `<div class="sec"><button data-a="back">‹ Settings</button><span>Kategori</span></div>` + ['expense', 'income'].map(k =>
-    `<div class="sec"><span>${k === 'expense' ? 'Expense' : 'Income'}</span><button data-a="catAdd" data-kind="${k}">+ Kategori</button></div>` +
-    S.cats.filter(c => c.kind === k && !c.parent_id).map(p =>
-      `<button class="mi" data-a="catEdit" data-id="${p.id}"><span>${esc(p.name)}</span><span class="mut">${p.monthly_budget ? 'Budget ' + fmt(p.monthly_budget) : ''}</span></button>` +
-      S.cats.filter(c => c.parent_id === p.id).map(c => `<button class="mi sub" data-a="catEdit" data-id="${c.id}"><span>› ${esc(c.name)}</span></button>`).join('') +
-      `<button class="mi sub mut" data-a="catAdd" data-kind="${k}" data-parent="${p.id}">+ Sub kategori</button>`).join('')).join('')
-  if (S.sub === 'accts') return `<div class="sec"><button data-a="back">‹ Settings</button><span>Accounts</span></div><div class="sec"><span>Group</span><button data-a="grpAdd">+ Group</button></div>` +
-    S.groups.map(g => `<button class="mi" data-a="grpEdit" data-id="${g.id}"><span>${esc(g.name)}</span><span class="mut">${g.type}</span></button>`).join('') +
-    `<div class="sec"><span>Account</span><button data-a="accAdd">+ Account</button></div>` +
-    S.accts.map(a => `<button class="mi" data-a="accEdit" data-id="${a.id}"><span>${esc(a.name)}</span><span class="mut">${esc(S.groups.find(g => g.id === a.group_id)?.name ?? '')} · ${a.type}</span></button>`).join('')
-  if (S.sub === 'rec') return `<div class="sec"><button data-a="back">‹ Settings</button><span>Rutin / Auto debit</span></div><div class="sec"><span>Dibuat otomatis tiap bulan</span><button data-a="recAdd">+ Tambah</button></div>` +
-    (S.rec.map(r => `<button class="mi" data-a="recEdit" data-id="${r.id}"><span>${esc(r.note || catName(r.category_id))} <span class="mut">tgl ${r.day_of_month}${r.active ? '' : ' · nonaktif'}</span></span><span class="${sign[r.kind]}">${fmt(r.amount)}</span></button>`).join('') || '<div class="empty">Belum ada</div>')
-  const mi = (k, l, d) => `<button class="mi" data-a="sub" data-v="${k}"><span>${l}</span><span class="mut">${d}</span></button>`
-  return `<div class="sec"><span>Category / Budget</span></div>${mi('cats', 'Kategori & Budget', 'Category › Sub')}<div class="sec"><span>Accounts</span></div>${mi('accts', 'Accounts & Groups', 'Asset / Liability')}<div class="sec"><span>Auto debit</span></div>${mi('rec', 'Transaksi rutin', 'Cicilan, langganan')}<div class="sec"><span>Akun</span></div><button class="mi" data-a="logout"><span>Keluar</span></button>`
+  if (S.sub === 'categories') return `<div class="sec"><button data-a="back">‹ Back</button><span>Kategori</span><button data-a="catAdd" data-kind="${S.sKind}">+ Kategori</button></div>` +
+    CategoriesView.render({ cats: S.cats, type: S.sKind, icon: categoryIcon, esc })
+  const ph = (t, m) => `<div class="sec"><button data-a="back">‹ Back</button><span>${t}</span></div><div class="empty">${m}</div>`
+  if (S.sub === 'groups') return vGroups()
+  if (S.sub === 'recurring') return vRecurring()
+  const svg = p => `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1f7a4d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${p}</svg>`
+  const icons = {
+    categories: svg('<path d="M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h7v7h-7z"/>'),
+    groups: svg('<path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>'),
+    recurring: svg('<path d="M17 2l4 4-4 4"/><path d="M3 11V9a3 3 0 0 1 3-3h15"/><path d="M7 22l-4-4 4-4"/><path d="M21 13v2a3 3 0 0 1-3 3H3"/>')
+  }
+  const chev = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>'
+  const mi = (k, l, d) => `<button class="mi g" data-a="sub" data-v="${k}"><span class="ic">${icons[k]}</span><span class="tt"><span>${l}</span><span class="mut">${d}</span></span>${chev}</button>`
+  return `<div class="sec"><span>Menu</span></div>${mi('categories', 'Categories', 'Category › Sub')}${mi('groups', 'Groups', 'Asset / Liability')}${mi('recurring', 'Recurring', 'Cicilan, langganan')}<div class="sec"><span>Akun</span></div><button class="mi" data-a="logout"><span>Keluar</span></button>`
 }
 
 // ---------- generic sheet ----------
@@ -199,12 +408,227 @@ function ask(title, fields, canDel) {
     }
   })
 }
-const confirmDel = r => r?._del ? confirm('Hapus item ini?') : !!r
+// ---------- Categories CRUD sheet: inline error, stays open on validation failure ----------
+// Add/edit a category (c = existing) or a sub-category (parent = category id; s = existing sub).
+function catSheet({ title, kind, c, parent, s }) {
+  const o = $('#ov'), target = s ?? c, isSub = parent != null || !!s
+  const showBudget = !isSub && (c?.kind ?? kind) === 'expense'
+  const subsHtml = c ? `<div class="sec"><span>Sub-kategori</span><button data-r="sa">+ Sub</button></div>` +
+    S.cats.filter(x => x.parent_id === c.id).map(x => `<div class="row"><div class="n">${esc(x.name)}</div><button data-r="se" data-id="${x.id}">Ubah</button><button data-r="sd" data-id="${x.id}" class="danger">Hapus</button></div>`).join('') : ''
+  o.innerHTML = `<div class="sheet"><h3>${esc(title)}</h3>
+    <label>Nama<input name="name" value="${esc(target?.name ?? '')}" autocomplete="off" aria-describedby="cerr"></label>
+    ${isSub ? '' : `<label>Ikon<select name="icon">${Object.entries(ICON_CHOICES).map(([k, [l]]) => `<option value="${k}"${(c?.icon || 'tag') === k ? ' selected' : ''}>${l}</option>`).join('')}</select></label>`}
+    ${showBudget ? `<label>Budget per bulan (Rp)<input name="budget" type="number" inputmode="numeric" value="${esc(c?.monthly_budget ?? 0)}"></label>` : ''}
+    <div class="err" id="cerr" role="alert"></div>${subsHtml}
+    <div class="btns"><button data-r="x">Batal</button>${target ? '<button data-r="d" class="danger">Hapus</button>' : ''}<button data-r="s" class="pri">Simpan</button></div></div>`
+  o.hidden = false
+  const err = m => { $('#cerr', o).textContent = m; $('[name=name]', o).setAttribute('aria-invalid', 'true') }
+  const reopen = async id => { await load(); const n = cat(id); n ? catSheet({ title: 'Edit kategori', c: n }) : (o.hidden = true) }
+  o.onclick = async e => {
+    const b = e.target.closest('[data-r]'); if (!b && e.target !== o) return
+    const r = b?.dataset.r
+    if (!r || r === 'x') { o.hidden = true; return }
+    try {
+      if (r === 'sa') { o.hidden = true; return catSheet({ title: 'Sub-kategori baru', parent: c.id }) }
+      if (r === 'se') { const x = cat(+b.dataset.id); return catSheet({ title: 'Edit sub-kategori', parent: c.id, s: x }) }
+      if (r === 'sd') {
+        const x = cat(+b.dataset.id)
+        if (!confirm(`Hapus sub-kategori "${x.name}"?\nJika sudah dipakai transaksi, transaksinya tidak dihapus dan akan dipindah ke Uncategorized / Other.`)) return
+        await api('DELETE', 'categories/' + x.id); return reopen(c.id)
+      }
+      if (r === 'd') {
+        const what = isSub ? 'sub-kategori' : 'kategori'
+        if (!confirm(`Hapus ${what} "${target.name}"?\nJika sudah dipakai transaksi, transaksinya tidak dihapus dan akan dipindah ke Uncategorized / Other (budget dan account ikut dihitung ulang).`)) return
+        await api('DELETE', 'categories/' + target.id); o.hidden = true
+        return isSub ? reopen(parent) : load()
+      }
+      if (r === 's') {
+        const name = $('[name=name]', o).value.trim()
+        if (!name) return err('Nama tidak boleh kosong')
+        const bv = $('[name=budget]', o)?.value
+        const monthly_budget = bv === undefined || bv === '' ? undefined : Math.round(Number(bv))
+        const icon = $('[name=icon]', o)?.value
+        if (target) await api('PUT', 'categories/' + target.id, { name, icon, monthly_budget })
+        else await api('POST', 'categories', { name, icon, kind: isSub ? undefined : kind, parent_id: isSub ? parent : null, monthly_budget })
+        o.hidden = true
+        return isSub ? reopen(parent) : load()
+      }
+    } catch (x) { if (x.message !== 'auth') err(x.message) }
+  }
+  setTimeout(() => $('[name=name]', o)?.focus(), 0)
+}
+// ---------- Groups CRUD sheet: inline error, stays open on API failure ----------
+const GROUP_TYPES = [['asset', 'Asset'], ['liability', 'Liability']] // hanya dua tipe
+const grpMsg = m => /FOREIGN KEY/i.test(m) ? 'Grup tidak bisa dihapus karena masih memiliki akun.' : /UNIQUE/i.test(m) ? 'Nama grup sudah dipakai.' : /CHECK/i.test(m) ? 'Tipe harus asset atau liability.' : /NOT NULL/i.test(m) ? 'Nama tidak boleh kosong' : m
+function groupSheet(g) {
+  const o = $('#ov')
+  o.innerHTML = `<div class="sheet"><h3>${g ? 'Edit group' : 'Group baru'}</h3>
+    <label>Nama (mis. BANK, Paylater)<input name="name" value="${esc(g?.name ?? '')}" autocomplete="off" aria-describedby="gerr"></label>
+    <label>Tipe<select name="type">${GROUP_TYPES.map(([v, l]) => `<option value="${v}"${(g?.type ?? 'asset') === v ? ' selected' : ''}>${l}</option>`).join('')}</select></label>
+    <div class="err" id="gerr" role="alert"></div>
+    <div class="btns"><button data-r="x">Batal</button>${g ? '<button data-r="d" class="danger">Hapus</button>' : ''}<button data-r="s" class="pri">Simpan</button></div></div>`
+  o.hidden = false
+  const err = m => { $('#gerr', o).textContent = m }
+  o.onclick = async e => {
+    const b = e.target.closest('[data-r]'); if (!b && e.target !== o) return
+    const r = b?.dataset.r
+    if (!r || r === 'x') { o.hidden = true; return }
+    try {
+      if (r === 'd') {
+        // dialog konfirmasi bergaya v2 (sheet), bukan confirm() bawaan browser
+        o.innerHTML = `<div class="sheet"><h3>Hapus group?</h3>
+          <p>Hapus group "${esc(g.name)}"? Group yang masih memiliki akun tidak bisa dihapus.</p>
+          <div class="err" id="gerr" role="alert"></div>
+          <div class="btns"><button data-r="cx">Batal</button><button data-r="cd" class="danger">Hapus</button></div></div>`
+        return
+      } else if (r === 'cx') { return groupSheet(g)
+      } else if (r === 'cd') {
+        try { await api('DELETE', 'groups/' + g.id) } catch (x) { if (x.message !== 'auth') { groupSheet(g); err(grpMsg(x.message)) } return }
+      } else if (r === 's') {
+        const name = $('[name=name]', o).value.trim(), type = $('[name=type]', o).value
+        if (!name) return err('Nama tidak boleh kosong')
+        if (!GROUP_TYPES.some(([v]) => v === type)) return err('Tipe harus asset atau liability.')
+        if (g) await api('PUT', 'groups/' + g.id, { name, type }); else await api('POST', 'groups', { name, type })
+      } else return
+      o.hidden = true
+      await load(); refreshGroups()
+    } catch (x) { if (x.message !== 'auth') err(grpMsg(x.message)) }
+  }
+  setTimeout(() => $('[name=name]', o)?.focus(), 0)
+}
+// ---------- Recurring CRUD sheet: inline error, stays open on API failure ----------
+// Hapus recurring hanya DELETE recurring/:id; transaksi yang sudah dibuat tidak disentuh.
+function recSheet(x) {
+  const o = $('#ov')
+  const opt = (opts, val) => opts.map(([v, l]) => `<option value="${esc(v)}"${String(v) === String(val) ? ' selected' : ''}>${esc(l)}</option>`).join('')
+  o.innerHTML = `<div class="sheet"><h3>${x ? 'Edit recurring' : 'Recurring baru'}</h3>
+    <label>Catatan (mis. Cicilan KPR)<input name="note" value="${esc(x?.note ?? '')}" autocomplete="off"></label>
+    <label>Jenis<select name="kind">${opt([['expense', 'Expense'], ['income', 'Income']], x?.kind ?? 'expense')}</select></label>
+    <label>Jumlah (Rp)<input name="amount" type="number" inputmode="numeric" value="${esc(x?.amount ?? '')}"></label>
+    <label>Akun<select name="account_id">${opt(S.accts.map(a => [a.id, a.name]), x?.account_id)}</select></label>
+    <label>Kategori<select name="category_id">${opt([['', '—'], ...S.cats.map(c => [c.id, catName(c.id)])], x?.category_id ?? '')}</select></label>
+    <label>Tanggal tiap bulan (1-31)<input name="day_of_month" type="number" inputmode="numeric" value="${esc(x?.day_of_month ?? 1)}"></label>
+    <label>Status<select name="active">${opt([[1, 'Aktif'], [0, 'Nonaktif']], x ? (x.active ? 1 : 0) : 1)}</select></label>
+    <div class="err" id="rerr" role="alert"></div>
+    <div class="btns"><button data-r="x">Batal</button>${x ? '<button data-r="d" class="danger">Hapus</button>' : ''}<button data-r="s" class="pri">Simpan</button></div></div>`
+  o.hidden = false
+  const err = m => { $('#rerr', o).textContent = m }
+  o.onclick = async e => {
+    const b = e.target.closest('[data-r]'); if (!b && e.target !== o) return
+    const r = b?.dataset.r
+    if (!r || r === 'x') { o.hidden = true; return }
+    try {
+      if (r === 'd') {
+        if (!confirm('Hapus recurring ini?\nTransaksi yang sudah dibuat sebelumnya tidak ikut dihapus.')) return
+        await api('DELETE', 'recurring/' + x.id)
+      } else if (r === 's') {
+        const v = n => $(`[name=${n}]`, o).value
+        const amount = Math.round(Number(v('amount'))), day = Math.round(Number(v('day_of_month')))
+        if (!(amount > 0)) return err('Jumlah harus lebih dari 0')
+        if (!v('account_id')) return err('Pilih akun')
+        if (!(day >= 1 && day <= 31)) return err('Tanggal harus 1-31')
+        const p = { kind: v('kind'), amount, account_id: Number(v('account_id')), category_id: v('category_id') === '' ? null : Number(v('category_id')), note: v('note').trim(), day_of_month: day, active: Number(v('active')) }
+        if (x) await api('PUT', 'recurring/' + x.id, p); else await api('POST', 'recurring', p)
+      } else return
+      o.hidden = true
+      await load(); refreshRecurring()
+    } catch (e2) { if (e2.message !== 'auth') err(e2.message) }
+  }
+  setTimeout(() => $('[name=note]', o)?.focus(), 0)
+}
+const confirmDel = r =>r?._del ? confirm('Hapus item ini?') : !!r
 
-// ---------- transaction form ----------
+// ---------- transaksi baru (layar penuh, desain v2 isNew/isTransfer) ----------
+const NF_MSG = { amount: 'Nominal harus lebih dari 0.', dateEmpty: 'Tanggal wajib diisi.', dateInvalid: 'Tanggal tidak valid.', account: 'Akun wajib dipilih.', from: 'Akun asal wajib dipilih.', to: 'Akun tujuan wajib dipilih.', same: 'Akun tujuan tidak boleh sama dengan akun asal.', category: 'Kategori wajib dipilih.', failed: 'Transaksi gagal disimpan. Silakan coba lagi.' }
+const nfValidDate = s => { const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s); if (!m) return false; const d = new Date(Date.UTC(+m[1], +m[2] - 1, +m[3])); return d.getUTCFullYear() === +m[1] && d.getUTCMonth() === +m[2] - 1 && d.getUTCDate() === +m[3] }
+function nfValidate(f) {
+  const e = {}
+  if (!(Number(f.amount) > 0)) e.amount = NF_MSG.amount
+  if (!String(f.date).trim()) e.date = NF_MSG.dateEmpty; else if (!nfValidDate(f.date)) e.date = NF_MSG.dateInvalid
+  if (f.type === 'transfer') {
+    if (!f.account) e.account = NF_MSG.from
+    if (!f.to) e.to = NF_MSG.to; else if (f.account && f.account === f.to) e.to = NF_MSG.same
+  } else {
+    if (!f.account) e.account = NF_MSG.account
+    if (!f.cat) e.cat = NF_MSG.category
+  }
+  return e
+}
+const NF_TYPE_LABEL = { expense: 'Expense', income: 'Income', transfer: 'Transfer' }
+function txNew() {
+  const f = { type: 'expense', amount: '', date: today(), account: null, to: null, cat: null, sub: null }
+  let errs = {}, failed = false, saving = false
+  const fm = $('#fm')
+  const G = '#1e5a43', INK = '#16211c', MUTED = '#6f7a73', LINE = '#ecebe4', MINT = '#e4f1e9'
+  const close = () => {
+    fm.hidden = true; fm.innerHTML = ''; fm.onclick = fm.oninput = null; document.onkeydown = null
+    $('#bottom-nav').classList.remove('hidden')
+    if (S.previousTab) { S.tab = S.previousTab; S.previousTab = null; render() }
+  }
+  const pill = on => `border:1px solid ${on ? G : LINE};background:${on ? MINT : '#fff'};color:${on ? G : INK}`
+  const err = k => errs[k] ? `<div role="alert" style="color:#c0392b;font-size:12px;margin-top:6px">${esc(errs[k])}</div>` : ''
+  const sec = (title, body) => `<div style="padding:20px 20px 0"><div style="font-size:14px;font-weight:700;margin-bottom:10px">${title}</div>${body}</div>`
+  const accts = (field, list) => `<div style="display:flex;flex-wrap:wrap;gap:8px">${list.map(a => `<button data-nf="${field}" data-v="${a.id}" style="height:40px;padding:0 16px;border-radius:999px;font-size:13px;font-weight:600;${pill(f[field] === a.id)}">${esc(a.name)}</button>`).join('')}</div>`
+  const draw = () => {
+    const tr = f.type === 'transfer'
+    const segs = ['income', 'expense', 'transfer'].map(k => `<button data-nf="type" data-v="${k}" style="height:40px;border-radius:999px;font-size:14px;font-weight:600;background:${f.type === k ? '#fff' : 'transparent'};color:${f.type === k ? INK : MUTED};box-shadow:${f.type === k ? '0 1px 3px rgba(22,33,28,.12)' : 'none'}">${NF_TYPE_LABEL[k]}</button>`).join('')
+    const catHtml = CategoryPicker.render({ cats: S.cats, type: f.type, cat: f.cat, sub: f.sub, error: errs.cat, icon: categoryIcon, esc })
+    fm.innerHTML = `<div class="in-wrap">
+      <div style="display:flex;align-items:center;gap:12px;padding:24px 20px 8px"><button data-nf="cancel" aria-label="Kembali" style="width:44px;height:44px;border-radius:50%;border:1px solid ${LINE};background:#fff;display:flex;align-items:center;justify-content:center;color:${INK}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg></button><span style="font-size:20px;font-weight:700;letter-spacing:-.01em">Transaksi Baru</span></div>
+      <div style="margin:12px 20px 0;padding:4px;border-radius:999px;background:${LINE};display:grid;grid-template-columns:repeat(3,minmax(0,1fr))">${segs}</div>
+      <div style="margin:16px 20px 0;padding:20px;border-radius:24px;background:#fff">
+        <div style="font-size:13px;color:${MUTED}">Nominal</div>
+        <div style="display:flex;align-items:baseline;gap:8px;margin-top:4px"><span style="font-size:22px;font-weight:600;color:#9aa39d">Rp</span><input name="amount" inputmode="numeric" placeholder="0" value="${f.amount ? fmt(f.amount) : ''}" style="flex:1;min-width:0;border:0;background:transparent;font-size:40px;font-weight:800;letter-spacing:-.02em;color:${INK};outline:none;padding:0"></div>${err('amount')}
+        <div style="display:flex;align-items:center;gap:10px;margin-top:14px;padding-top:14px;border-top:1px solid ${LINE}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="${MUTED}" stroke-width="1.9" stroke-linecap="round"><path d="M8 2v4M16 2v4M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zM3 10h18"/></svg><input type="date" name="date" value="${esc(f.date)}" style="flex:1;border:0;background:transparent;font-size:14px;font-weight:500;color:${INK};outline:none;padding:0"></div>${err('date')}
+      </div>
+      ${sec(tr ? 'Dari akun' : 'Akun', accts('account', S.accts) + err('account'))}
+      ${tr ? sec('Ke akun', accts('to', S.accts) + err('to')) : ''}
+      ${tr ? '' : catHtml}
+      <div style="display:flex;flex-direction:column;gap:8px;padding:24px 20px 0">
+        ${failed ? `<div role="alert" style="color:#c0392b;font-size:13px;text-align:center">${esc(NF_MSG.failed)}</div>` : ''}
+        <button data-nf="save" ${saving ? 'disabled' : ''} style="height:56px;border-radius:999px;background:${G};color:#fff;font-size:15px;font-weight:700">Simpan ${NF_TYPE_LABEL[f.type]}</button>
+        <button data-nf="cancel" style="height:48px;border-radius:999px;color:${MUTED};font-size:14px;font-weight:600">Batal</button>
+      </div></div>`
+    fm.hidden = false
+  }
+  fm.oninput = e => {
+    const n = e.target.name
+    if (n === 'amount') { f.amount = e.target.value.replace(/\D/g, '').slice(0, 13); e.target.value = f.amount ? fmt(f.amount) : '' }
+    else if (n === 'date') f.date = e.target.value
+  }
+  fm.onclick = async e => {
+    const b = e.target.closest('[data-nf]'); if (!b) return
+    const k = b.dataset.nf, v = b.dataset.v
+    if (k === 'cancel') return close()
+    if (k === 'type') { if (f.type !== v) { f.type = v; f.cat = f.sub = null; errs = {}; failed = false; draw() } return }
+    if (k === 'cat') { Object.assign(f, CategoryPicker.selectCategory(f, +v)); delete errs.cat; return draw() }
+    if (k === 'sub') { Object.assign(f, CategoryPicker.selectSub(f, +v, S.cats)); return draw() }
+    if (k === 'account' || k === 'to') { f[k] = +v; delete errs[k]; delete errs.to; return draw() }
+    if (k === 'save') {
+      if (saving) return
+      errs = nfValidate(f); failed = false
+      if (Object.keys(errs).length) return draw()
+      saving = true; b.disabled = true
+      try {
+        await api('POST', 'transactions', { date: f.date, kind: f.type, amount: Number(f.amount), account_id: f.account, to_account_id: f.type === 'transfer' ? f.to : null, category_id: f.type === 'transfer' ? null : (f.sub || f.cat), note: '' })
+      } catch (x) { saving = false; if (x.message === 'auth') return; failed = true; return draw() }
+      S.month = f.date.slice(0, 7) < today().slice(0, 7) ? f.date.slice(0, 7) : today().slice(0, 7); S.tab = 'trans'; S.previousTab = null
+      close(); load()
+    }
+  }
+  document.onkeydown = e => { if (e.key === 'Escape' && !fm.hidden) close() }
+  draw()
+}
+
+// ---------- transaction form (edit) ----------
 function txForm(t) {
   const f = t ? { ...t, _o: t } : { kind: 'expense', date: today(), amount: '', account_id: S.accts[0]?.id ?? null, to_account_id: null, category_id: null, note: '' }
-  const fm = $('#fm'), close = () => { fm.hidden = true; fm.innerHTML = '' }
+  const fm = $('#fm'), close = () => {
+    fm.hidden = true; fm.innerHTML = ''
+    document.onkeydown = null
+    $('#bottom-nav').classList.remove('hidden')
+    if (S.previousTab) { S.tab = S.previousTab; S.previousTab = null; render() }
+  }
   const catOpts = () => {
     const kind = f.kind === 'income' ? 'income' : 'expense'
     return '<option value="">—</option>' + S.cats.filter(c => c.kind === kind && !c.parent_id).map(p =>
@@ -220,7 +644,7 @@ function txForm(t) {
     return `Sisa budget ${esc(b.name)}: ${fmt(rem)} → <b class="${rem - (+f.amount || 0) < 0 ? 'ex' : ''}">${fmt(rem - (+f.amount || 0))}</b>`
   }
   const draw = () => {
-    fm.innerHTML = `<div class="in-wrap"><header>${t ? 'Edit' : 'Transaksi baru'}</header>
+    fm.innerHTML = `<div class="in-wrap"><header style="display:flex;align-items:center;gap:8px"><button data-r="x" aria-label="Kembali" style="background:none;border:0;padding:4px 8px 4px 0;font-size:22px;line-height:1;color:inherit;cursor:pointer">←</button>${t ? 'Edit' : 'Transaksi baru'}</header>
       <div class="seg">${['income', 'expense', 'transfer'].map(k => `<button data-k="${k}" class="${f.kind === k ? 'on' : ''}">${k[0].toUpperCase() + k.slice(1)}</button>`).join('')}</div>
       <div class="f"><label>Tanggal</label><input type="date" name="date" value="${esc(f.date)}"></div>
       <div class="f amt"><label>Jumlah</label><input name="amount" inputmode="numeric" placeholder="0" value="${f.amount ? fmt(f.amount) : ''}"></div>
@@ -249,38 +673,26 @@ function txForm(t) {
       close(); load()
     }
   })
+  document.onkeydown = e => { if (e.key === 'Escape' && !fm.hidden) close() }
   draw()
 }
 
 // ---------- actions ----------
 const A = {
   tab: d => { S.tab = d.v; S.sub = null; render() },
-  mon: d => { S.month = shiftMonth(S.month, +d.v); load() },
-  add: () => txForm(),
+  retry: () => load(),
+  mon: d => { if (+d.v > 0 && !canGoNext(S.month, today().slice(0, 7))) return; S.month = shiftMonth(S.month, +d.v); load() },
+  add: () => { S.previousTab = S.tab; $('#bottom-nav').classList.add('hidden'); txNew() },
+  acctAddV2: () => onAcctAddV2(),
   edit: d => txForm(S.txs.find(t => t.id === +d.id)),
   sTab: d => { S.sTab = d.v; render() }, sKind: d => { S.sKind = d.v; render() },
-  sub: d => { S.sub = d.v; render() }, back: () => { S.sub = null; render() },
+  sub: d => { S.sub = d.v; history.pushState({ sub: d.v }, ''); render(); if (d.v === 'groups') refreshGroups(); if (d.v === 'recurring') refreshRecurring() },
+  back: () => { if (history.state?.sub) history.back(); else { S.sub = null; render() } },
   logout: async () => { document.cookie = 'midas=; Max-Age=0; Path=/'; showLogin() },
-  catAdd: async d => {
-    const parent = d.parent ? +d.parent : null
-    const r = await ask(parent ? 'Sub kategori baru' : 'Kategori baru', [{ k: 'name', label: 'Nama' }, ...(parent || d.kind === 'income' ? [] : [{ k: 'monthly_budget', label: 'Budget per bulan (Rp)', type: 'number', value: 0 }])])
-    if (r?.name) { await api('POST', 'categories', { name: r.name, kind: d.kind, parent_id: parent, monthly_budget: r.monthly_budget ?? 0 }); load() }
-  },
-  catEdit: async d => {
-    const c = cat(+d.id), top = !c.parent_id
-    const r = await ask('Edit kategori', [{ k: 'name', label: 'Nama', value: c.name }, ...(top && c.kind === 'expense' ? [{ k: 'monthly_budget', label: 'Budget per bulan (Rp)', type: 'number', value: c.monthly_budget }] : [])], true)
-    if (!confirmDel(r)) return
-    if (r._del) await api('DELETE', 'categories/' + c.id); else await api('PUT', 'categories/' + c.id, r)
-    load()
-  },
-  grpAdd: async () => { const r = await ask('Group baru', [{ k: 'name', label: 'Nama (mis. BANK, Paylater)' }, { k: 'type', label: 'Tipe', options: [['asset', 'Asset'], ['liability', 'Liability']] }]); if (r?.name) { await api('POST', 'groups', r); load() } },
-  grpEdit: async d => {
-    const g = S.groups.find(x => x.id === +d.id)
-    const r = await ask('Edit group', [{ k: 'name', label: 'Nama', value: g.name }, { k: 'type', label: 'Tipe', value: g.type, options: [['asset', 'Asset'], ['liability', 'Liability']] }], true)
-    if (!confirmDel(r)) return
-    if (r._del) await api('DELETE', 'groups/' + g.id); else await api('PUT', 'groups/' + g.id, r)
-    load()
-  },
+  catAdd: d => catSheet({ title: 'Kategori baru', kind: d.kind }),
+  catEdit: d => catSheet({ title: 'Edit kategori', c: cat(+d.id) }),
+  grpAdd: () => groupSheet(null),
+  grpEdit: d => groupSheet(S.groups.find(x => x.id === +d.id)),
   accAdd: async () => A._acc(null),
   accEdit: d => A._acc(S.accts.find(a => a.id === +d.id)),
   _acc: async a => {
@@ -292,24 +704,10 @@ const A = {
     if (a) await api('PUT', 'accounts/' + a.id, r); else await api('POST', 'accounts', r)
     load()
   },
-  recAdd: () => A._rec(null), recEdit: d => A._rec(S.rec.find(r => r.id === +d.id)),
-  _rec: async x => {
-    const r = await ask(x ? 'Edit rutin' : 'Transaksi rutin', [
-      { k: 'note', label: 'Nama (mis. Cicilan KPR)', value: x?.note },
-      { k: 'kind', label: 'Tipe', value: x?.kind ?? 'expense', options: [['expense', 'Expense'], ['income', 'Income']] },
-      { k: 'amount', label: 'Jumlah (Rp)', type: 'number', value: x?.amount },
-      { k: 'account_id', label: 'Account', num: true, value: x?.account_id, options: S.accts.map(a => [a.id, a.name]) },
-      { k: 'category_id', label: 'Kategori', value: x?.category_id ?? '', options: [['', '—'], ...S.cats.map(c => [c.id, catName(c.id)])] },
-      { k: 'day_of_month', label: 'Tanggal tiap bulan (1-31)', type: 'number', value: x?.day_of_month ?? 1 },
-      { k: 'active', label: 'Status', num: true, value: x?.active ?? 1, options: [[1, 'Aktif'], [0, 'Nonaktif']] }], !!x)
-    if (!confirmDel(r)) return
-    if (r._del) return (await api('DELETE', 'recurring/' + x.id), load())
-    r.category_id = r.category_id === '' ? null : Number(r.category_id)
-    if (x) await api('PUT', 'recurring/' + x.id, r); else await api('POST', 'recurring', r)
-    load()
-  },
+  recAdd: () => recSheet(null), recEdit: d => recSheet(S.rec.find(r => r.id === +d.id)),
 }
 $('#app').onclick = e => { const t = e.target.closest('[data-a]'); if (t) guard(A[t.dataset.a])(t.dataset) }
+window.addEventListener('popstate', () => { if (S.sub) { S.sub = null; S.tab = 'more'; render() } })
 load()
 </script>
 </body>

@@ -1,4 +1,5 @@
 import { DatabaseSync } from 'node:sqlite'
+import { migrateCategories, ensureUncategorized } from './categories.js'
 
 const SCHEMA = `
 create table if not exists account_groups(id integer primary key, name text not null unique, type text not null check(type in ('asset','liability')));
@@ -23,6 +24,8 @@ export function openDb(path = ':memory:') {
   const db = new DatabaseSync(path)
   db.exec('pragma foreign_keys=on; pragma journal_mode=wal;')
   db.exec(SCHEMA)
+  migrateCategories(db)
+  ensureUncategorized(db)
   return db
 }
 
