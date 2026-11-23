@@ -18,6 +18,15 @@ button,input,select,.num,.amt,time{font-family:inherit;font-variant-numeric:tabu
 #app{max-width:var(--layout-width);margin:0 auto;overflow-x:hidden;min-height:100vh;display:flex;flex-direction:column}
 header .brand{display:inline-flex;align-items:center;gap:8px;font-weight:800;font-size:18px;letter-spacing:.14em;color:var(--color-primary)}
 header .brand svg{width:30px;height:30px;filter:drop-shadow(0 2px 4px #1e5a4344)}
+.brand .word{display:inline-flex}
+.brand .l{display:inline-block}
+.brand.intro .sq{transform-box:fill-box;transform-origin:center;animation:bSq .22s ease-out both;animation-delay:calc(0ms - var(--e))}
+.brand.intro .coin{transform-box:fill-box;transform-origin:center;animation:bCoin .4s cubic-bezier(.3,1.5,.5,1) both;animation-delay:calc(.18s - var(--e))}
+.brand.intro .l{animation:bLet .2s ease-out both;animation-delay:calc(.5s + var(--i) * .07s - var(--e))}
+@keyframes bSq{from{opacity:0;transform:scale(.7)}to{opacity:1;transform:none}}
+@keyframes bCoin{0%{opacity:0;transform:translateY(-26px) scale(.7)}60%{opacity:1}100%{opacity:1;transform:none}}
+@keyframes bLet{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.brand.intro *{animation:none!important}}
 header{padding:14px 14px 8px;text-align:center;font-weight:600;font-size:17px;position:sticky;top:0;background:var(--bg);z-index:2}
 main{flex:1;padding-bottom:90px}
 button,input,select{font:inherit;color:inherit}
@@ -290,8 +299,15 @@ const family = id => { const c = cat(id); return c ? (c.parent_id ?? c.id) : nul
 const monthLabel = m => new Date(m + '-01T00:00:00').toLocaleDateString('en-GB', { month: 'short', year: 'numeric' })
 const sign = { income: 'in', expense: 'ex', transfer: '' }
 
+// Logo intro: only plays right after page load; negative delays fast-forward re-renders inside the window
+const INTRO_MS = 1400
+const brandHtml = () => {
+  const e = performance.now(), on = e < INTRO_MS
+  const letters = [...'MIDAS'].map((c, i) => `<span class="l" style="--i:${i}">${c}</span>`).join('')
+  return `<span class="brand${on ? ' intro' : ''}" style="--e:${on ? Math.round(e) : 0}ms" aria-label="MIDAS"><svg viewBox="0 0 32 32" aria-hidden="true"><rect class="sq" width="32" height="32" rx="9" fill="#1e5a43"/><g class="coin"><circle cx="16" cy="16" r="10" fill="#f5b301"/><circle cx="16" cy="16" r="7.6" fill="none" stroke="#c98a0b" stroke-width="1"/><path d="M11.2 21V11l4.8 6 4.8-6v10" fill="none" stroke="#1e5a43" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></g></svg><span class="word" aria-hidden="true">${letters}</span></span>`
+}
 function render() {
-  const titles = { trans: `<span class="brand"><svg viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="9" fill="#1e5a43"/><circle cx="16" cy="16" r="10" fill="#f5b301"/><circle cx="16" cy="16" r="7.6" fill="none" stroke="#c98a0b" stroke-width="1"/><path d="M11.2 21V11l4.8 6 4.8-6v10" fill="none" stroke="#1e5a43" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>MIDAS</span>`, stats: 'Stats', accts: '', more: 'Settings' }
+  const titles = { trans: brandHtml(), stats, stats: 'Stats', accts: '', more: 'Settings' }
   const body = S.status !== 'ready' ? vState() : ({ trans: vTrans, stats: vStats, accts: vAccts, more: vMore }[S.tab] || vPlaceholder)()
   document.querySelectorAll('#bottom-nav .bn-tab').forEach(b => b.classList.toggle('active', TAB_MAP[b.dataset.tab] === S.tab))
   $('#app').innerHTML = `<header>${titles[S.tab] ?? ''}</header><main>${body}</main>`
