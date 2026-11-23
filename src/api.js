@@ -96,7 +96,10 @@ export function createApp(db, { token, password, runClaude = defaultRunClaude, d
     const [table, cols] = r
     if (method === 'GET' && !id) {
       const month = url.searchParams.get('month')
-      const rows = name === 'transactions' && month
+      const account = +url.searchParams.get('account')
+      const rows = name === 'transactions' && account
+        ? db.prepare('select * from transactions where account_id=? or to_account_id=? order by date desc, id desc').all(account, account)
+        : name === 'transactions' && month
         ? db.prepare('select * from transactions where substr(date,1,7)=? order by date desc, id desc').all(month)
         : db.prepare(`select * from ${table} order by id`).all()
       return send(res, 200, rows)

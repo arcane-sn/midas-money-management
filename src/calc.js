@@ -21,5 +21,5 @@ export function totals(db) {
     const b = accountBalance(db, a.id)
     if (a.type === 'asset') assets += b; else liabilities += b
   }
-  return { assets, liabilities, total: assets + liabilities }
+  return { assets, liabilities, total: assets - Math.abs(liabilities) }
 }

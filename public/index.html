@@ -56,7 +56,9 @@ button{background:none;border:0;cursor:pointer;padding:0}
 .row .amt small{display:block;font-size:11px;color:#9aa39d;margin-top:3px}
 .badge{flex:none;background:#eceee9;color:var(--mut);border-radius:999px;font-size:11px;font-weight:600;padding:1px 8px}
 .badge.r{background:#fdf1dc;color:#8a5b14}
-.fab{position:fixed;right:max(14px,calc(50% - 206px));bottom:calc(70px + env(safe-area-inset-bottom));width:52px;height:52px;border-radius:50%;background:var(--red);font-size:30px;color:#fff;box-shadow:0 4px 14px #0008;z-index:3}
+.fab{position:fixed;right:max(14px,calc(50% - 206px));bottom:calc(70px + env(safe-area-inset-bottom));width:52px;height:52px;border-radius:50%;background:var(--red);font-size:0;color:#fff;box-shadow:0 4px 14px #0008;z-index:3}
+.fab::before,.fab::after{content:'';position:absolute;left:50%;top:50%;width:20px;height:3px;border-radius:2px;background:#fff;transform:translate(-50%,-50%)}
+.fab::after{transform:translate(-50%,-50%) rotate(90deg)}
 nav{position:fixed;bottom:0;left:0;right:0;z-index:3;background:var(--bg);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom)}
 nav div{max-width:var(--layout-width);margin:0 auto;display:flex}
 nav button{flex:1;padding:9px 0 8px;color:var(--mut);font-size:11px}
@@ -71,6 +73,9 @@ nav button.on{color:var(--red)}nav button i{display:block;font-style:normal;font
 .accts-list{min-width:0}
 .acct-item{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:16px;margin-top:10px;background:#fff;border-radius:16px}
 .acct-name{min-width:0;font-size:14px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.grp2{display:flex;justify-content:space-between;align-items:baseline;padding:18px 4px 0;font-size:12px;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.04em}
+.grp2.liab{color:var(--red)}
+.acct-item.liab{background:#fdeeee}.acct-item.liab .acct-bal{color:var(--red)}
 .acct-bal{font-size:14px;font-weight:700;white-space:nowrap}
 .grp{background:var(--card);padding:7px 14px;display:flex;justify-content:space-between;color:var(--mut);font-size:13px}
 .bar{height:6px;border-radius:3px;background:var(--line2);margin-top:6px;overflow:hidden}.bar i{display:block;height:100%;background:var(--blue)}
@@ -107,6 +112,15 @@ nav button.on{color:var(--red)}nav button i{display:block;font-style:normal;font
 .acts .pri{background:var(--red);color:#fff;font-weight:600}.acts .danger{color:var(--red)}
 #ov{position:fixed;inset:0;background:#000a;z-index:20;display:flex;align-items:flex-end;justify-content:center}
 #ov[hidden]{display:none}
+@keyframes ovIn{from{opacity:0}to{opacity:1}}
+@keyframes sheetIn{from{transform:translateY(24px);opacity:0}to{transform:none;opacity:1}}
+@keyframes sk{0%{background-position:200% 0}100%{background-position:-200% 0}}
+#ov:not([hidden]){animation:ovIn .2s ease-out}
+#ov:not([hidden]) .sheet{animation:sheetIn .28s cubic-bezier(.2,.8,.2,1)}
+.skel{padding:0 20px}
+.skel i{display:block;height:60px;margin-top:10px;border-radius:16px;background:linear-gradient(90deg,#eceee9 25%,#f6f7f3 50%,#eceee9 75%);background-size:200% 100%;animation:sk 1.4s linear infinite}
+.skel i.h{height:130px;margin-top:0;border-radius:20px}
+@media (prefers-reduced-motion:reduce){#ov:not([hidden]),#ov:not([hidden]) .sheet,.skel i{animation:none}}
 .sheet{width:100%;max-width:var(--layout-width);background:var(--card);border-radius:16px 16px 0 0;padding:16px 16px calc(16px + env(safe-area-inset-bottom));max-height:90vh;overflow:auto}
 .sheet h3{margin:0 0 10px}.sheet label{display:block;color:var(--mut);font-size:12px;margin-top:10px}
 .sheet input,.sheet select{width:100%;margin-top:4px;padding:11px;background:var(--bg);border:1px solid var(--line);border-radius:8px;color:var(--txt)}
@@ -173,17 +187,18 @@ async function load() {
     const [sum, cats, groups, txs, rec] = await Promise.all([api('GET', 'summary?month=' + S.month), api('GET', 'categories'), api('GET', 'groups'), api('GET', 'transactions?month=' + S.month), api('GET', 'recurring')])
     if (my !== loadSeq) return
     ;[S.sum, S.cats, S.groups, S.txs, S.rec] = [sum, cats, groups, txs, rec]
-    S.accts = S.sum.accounts; S.status = 'ready'; render()
+    S.accts = S.sum.accounts; S.status = 'ready'; render(); if (S.acctView) openAcct(S.acctView)
   } catch (e) {
     if (my !== loadSeq || e.message === 'auth') return
     S.status = 'error'; S.error = e.message; render()
   }
 }
 
+const skeleton = (hero, n = 5) => `<div class="skel" role="status" aria-label="Memuat">${hero ? '<i class="h"></i>' : ''}${'<i></i>'.repeat(n)}</div>`
 function vState() {
   const bar = S.tab === 'trans' ? spentCard(true) : ''
   const cls = S.tab === 'trans' ? 'tempty' : 'empty'
-  if (S.status === 'loading') return bar + `<div class="${cls}" role="status">Memuat…</div>`
+  if (S.status === 'loading') return skeleton(S.tab === 'trans')
   return bar + `<div class="${cls}" role="alert">Gagal memuat data${S.error ? ': ' + esc(S.error) : ''}<br><button data-a="retry">Coba lagi</button></div>`
 }
 
@@ -210,7 +225,7 @@ $('#bottom-nav').onclick = e => {
     S.previousTab = S.tab; $('#bottom-nav').classList.add('hidden'); txNew(); return
   }
   const b = e.target.closest('.bn-tab'); if (!b || !TAB_MAP[b.dataset.tab]) return
-  S.tab = TAB_MAP[b.dataset.tab]; S.sub = null
+  S.tab = TAB_MAP[b.dataset.tab]; S.sub = null; S.acctView = null
   if (S.status) render(); else document.querySelectorAll('#bottom-nav .bn-tab').forEach(x => x.classList.toggle('active', x === b))
   if (S.tab === 'accts' && S.status === 'ready') refreshAccts()
 }
@@ -275,18 +290,47 @@ function vStatsBody() {
   return parts.join('')
 }
 
+function vAcctDetail() {
+  const a = acc2(S.acctView); if (!a) { S.acctView = null; return vAccts() }
+  const liab = a.type === 'liability'
+  let list
+  if (S.acctTxs === null) list = skeleton(false, 4)
+  else if (!S.acctTxs.length) list = '<div class="tempty" style="margin:16px 0">Belum ada transaksi di akun ini.</div>'
+  else {
+    list = '<div class="dcard" style="margin-top:12px">' + S.acctTxs.map(t => {
+      const c = cat(t.category_id), parent = cat(c?.parent_id)
+      const top = t.kind === 'transfer' ? 'Transfer' : (parent?.name ?? c?.name ?? '—')
+      const sub = t.kind === 'transfer' || !parent ? '' : c.name
+      const out = t.kind === 'expense' || (t.kind === 'transfer' && t.account_id === a.id)
+      const other = t.kind === 'transfer' ? (t.account_id === a.id ? '→ ' + acc(t.to_account_id) : '← ' + acc(t.account_id)) : ''
+      return `<div class="row" role="button" tabindex="0" data-a="edit" data-id="${t.id}"><div class="ico" aria-hidden="true">${categoryIcon(top)}</div><div class="n"><span>${esc(sub || top)}</span><small>${esc(other || t.note || '')}</small></div><div class="amt"><b class="${out ? 'ex' : 'in'}">${out ? '−' : '+'}${fmt(t.amount)}</b><small>${esc(t.date)}</small></div></div>`
+    }).join('') + '</div>'
+  }
+  return `<section class="accts-v2" aria-label="${esc(a.name)}"><div class="v2-head"><button class="back" data-a="acctBack" aria-label="Back"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"></path><path d="M19 12H5"></path></svg></button><h1 class="ttl">${esc(a.name)}</h1><button class="add" data-a="accEditD" data-id="${a.id}">Edit</button></div><div class="acct-item${liab ? ' liab' : ''}" style="margin-top:4px"><span class="acct-name">Saldo</span><b class="num acct-bal ${a.balance < 0 ? 'ex' : ''}">${fmtRupiah(a.balance)}</b></div>${list}</section>`
+}
+const acc2 = id => S.accts.find(a => a.id === id)
+async function openAcct(id) {
+  S.acctView = id; S.acctTxs = null; render()
+  try { const r = await api('GET', 'transactions?account=' + id); if (S.acctView === id) { S.acctTxs = r; render() } } catch (e) { if (e.message !== 'auth') { S.acctTxs = []; render() } }
+}
+
 function vAccts() {
+  if (S.acctView) return vAcctDetail()
   let list
   if (S.acctsErr) list = `<div class="empty" role="alert">Gagal memuat akun<br><button data-a="acctsRetry">Coba lagi</button></div>`
   else if (!S.accts.length) list = '<div class="empty">Belum ada akun.</div>'
-  else list = S.accts.map(a => `<div class="acct-item"><span class="acct-name">${esc(a.name)}</span><b class="num acct-bal ${a.balance < 0 ? 'ex' : ''}">${fmtRupiah(a.balance)}</b></div>`).join('')
-  return `<section class="accts-v2" aria-label="Accounts"><h1 class="accts-title">Accounts</h1><div class="accts-list" id="accts-list">${list}</div><button class="fab" data-a="acctAddV2" aria-label="Tambah akun">+</button></section>`
+  else {
+    const t = S.sum?.totals
+    list = t ? `<div class="sum" style="margin-top:8px"><div>Assets<b class="num in">${fmt(t.assets)}</b></div><div>Liabilities<b class="num ex">${fmt(t.liabilities)}</b></div><div>Net Worth<b class="num ${t.total < 0 ? 'ex' : ''}">${fmt(t.total)}</b></div></div>` : ''
+    for (const g of [...S.groups, { id: null, name: 'Lainnya', type: 'asset' }].sort((a, b) => (b.type === 'liability') - (a.type === 'liability'))) {
+      const items = S.accts.filter(a => (a.group_id ?? null) === g.id); if (!items.length) continue
+      const gs = items.reduce((n, a) => n + a.balance, 0)
+      list += `<div class="grp2${g.type === 'liability' ? ' liab' : ''}"><span>${esc(g.name)}${g.type === 'liability' ? ' · Liability' : ''}</span><b class="num ${gs < 0 ? 'ex' : ''}">${fmtRupiah(gs)}</b></div>` +
+        items.map(a => `<div class="acct-item${g.type === 'liability' ? ' liab' : ''}" role="button" tabindex="0" data-a="acctOpen" data-id="${a.id}"><span class="acct-name">${esc(a.name)}</span><b class="num acct-bal ${a.balance < 0 ? 'ex' : ''}">${fmtRupiah(a.balance)}</b></div>`).join('')
+    }
+  }
+  return `<section class="accts-v2" aria-label="Accounts"><h1 class="accts-title">Accounts</h1><div class="accts-list" id="accts-list">${list}</div><button class="fab" data-a="accAdd" aria-label="Tambah akun">+</button></section>`
 }
-
-// Tombol tambah akun: sengaja tidak melakukan apa pun.
-// Aksinya (membuka bottom sheet akun) dikerjakan di tiket bottom sheet akun.
-// Dipanggil lewat A.acctAddV2 agar handler #app tidak error.
-function onAcctAddV2() {}
 
 // Ambil ulang data akun dari GET /api/summary setiap layar Accounts dibuka (tanpa cache)
 let acctsSeq = 0
@@ -306,7 +350,7 @@ document.addEventListener('click', e => { if (e.target.closest('[data-a="acctsRe
 
 function vAcctsLegacy() {
   const t = S.sum.totals
-  let html = `<div class="sum"><div>Assets<b class="num in">${fmt(t.assets)}</b></div><div>Liabilities<b class="num ex">${fmt(t.liabilities)}</b></div><div>Total<b class="num">${fmt(t.total)}</b></div></div>`
+  let html = `<div class="sum"><div>Assets<b class="num in">${fmt(t.assets)}</b></div><div>Liabilities<b class="num ex">${fmt(t.liabilities)}</b></div><div>Net Worth<b class="num ${t.total < 0 ? 'ex' : ''}">${fmt(t.total)}</b></div></div>`
   const groups = [...S.groups, { id: null, name: 'Lainnya', type: 'asset' }]
   for (const g of groups) {
     const list = S.accts.filter(a => (a.group_id ?? null) === g.id); if (!list.length) continue
@@ -321,7 +365,7 @@ function vAcctsLegacy() {
 function vGroups() {
   let list
   if (S.groupsErr) list = `<div class="empty" role="alert">Gagal memuat grup<br><button data-a="groupsRetry">Coba lagi</button></div>`
-  else if (S.groupsLoading && !S.groups.length) list = '<div class="empty" role="status">Memuat…</div>'
+  else if (S.groupsLoading && !S.groups.length) list = skeleton(false, 4)
   else if (!S.groups.length) list = '<div class="empty">Belum ada grup.</div>'
   else list = S.groups.map(g => `<div class="acct-item" role="button" tabindex="0" data-a="grpEdit" data-id="${g.id}"><span class="acct-name">${esc(g.name)}</span><span class="badge${g.type === 'liability' ? ' r' : ''}">${g.type === 'liability' ? 'Liability' : 'Asset'}</span></div>`).join('')
   return `<section class="accts-v2" aria-label="Groups"><div class="sec" style="margin:0 -20px"><button data-a="back">‹ Back</button><button data-a="grpAdd">+ Group</button></div><h1 class="accts-title">Groups</h1><div class="accts-list">${list}</div></section>`
@@ -350,7 +394,7 @@ document.addEventListener('click', e => { if (e.target.closest('[data-a="groupsR
 function vRecurring() {
   let list
   if (S.recErr) list = `<div class="empty" role="alert">Gagal memuat recurring<br><button data-a="recRetry">Coba lagi</button></div>`
-  else if (S.recLoading && !S.rec.length) list = '<div class="empty" role="status">Memuat…</div>'
+  else if (S.recLoading && !S.rec.length) list = skeleton(false, 4)
   else if (!S.rec.length) list = '<div class="rec-empty"><span class="ico"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="m17 2 4 4-4 4"></path><path d="M3 11v-1a4 4 0 0 1 4-4h14"></path><path d="m7 22-4-4 4-4"></path><path d="M21 13v1a4 4 0 0 1-4 4H3"></path></svg></span><div class="t">No recurring transactions yet</div><div class="d">Add installments and subscriptions once. They’re created automatically each month.</div><button data-a="recAdd">+ Add recurring</button></div>'
   else list = S.rec.map(r => `<div class="acct-item" role="button" tabindex="0" data-a="recEdit" data-id="${r.id}"><span style="min-width:0"><b>${esc(r.note || '—')}</b><br><span class="mut">${esc(acc(r.account_id))} · ${esc(catName(r.category_id))}<br>Tiap tgl ${esc(r.day_of_month)} · Last run: ${r.last_run ? esc(r.last_run) : '—'}</span></span><span style="text-align:right"><b class="num ${r.kind === 'income' ? 'in' : 'ex'}">${r.kind === 'income' ? '+' : '−'}${fmt(r.amount)}</b><br><span class="badge${r.active ? '' : ' r'}">${r.active ? 'Aktif' : 'Nonaktif'}</span> <span class="badge">${r.kind === 'income' ? 'Income' : 'Expense'}</span></span></div>`).join('')
   return `<section class="accts-v2" aria-label="Recurring"><div class="v2-head"><button class="back" data-a="back" aria-label="Back"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"></path><path d="M19 12H5"></path></svg></button><h1 class="ttl">Recurring &amp; Auto Debit</h1>${S.rec.length ? '<button class="add" data-a="recAdd">+ Recurring</button>' : ''}</div><div class="accts-list">${list}</div></section>`
@@ -683,8 +727,7 @@ const A = {
   retry: () => load(),
   mon: d => { if (+d.v > 0 && !canGoNext(S.month, today().slice(0, 7))) return; S.month = shiftMonth(S.month, +d.v); load() },
   add: () => { S.previousTab = S.tab; $('#bottom-nav').classList.add('hidden'); txNew() },
-  acctAddV2: () => onAcctAddV2(),
-  edit: d => txForm(S.txs.find(t => t.id === +d.id)),
+  edit: d => txForm(S.txs.find(t => t.id === +d.id) ?? S.acctTxs?.find(t => t.id === +d.id)),
   sTab: d => { S.sTab = d.v; render() }, sKind: d => { S.sKind = d.v; render() },
   sub: d => { S.sub = d.v; history.pushState({ sub: d.v }, ''); render(); if (d.v === 'groups') refreshGroups(); if (d.v === 'recurring') refreshRecurring() },
   back: () => { if (history.state?.sub) history.back(); else { S.sub = null; render() } },
@@ -694,6 +737,9 @@ const A = {
   grpAdd: () => groupSheet(null),
   grpEdit: d => groupSheet(S.groups.find(x => x.id === +d.id)),
   accAdd: async () => A._acc(null),
+  acctOpen: d => openAcct(+d.id),
+  acctBack: () => { S.acctView = null; render() },
+  accEditD: d => A._acc(S.accts.find(a => a.id === +d.id)),
   accEdit: d => A._acc(S.accts.find(a => a.id === +d.id)),
   _acc: async a => {
     const r = await ask(a ? 'Edit account' : 'Account baru', [{ k: 'name', label: 'Nama', value: a?.name }, { k: 'group_id', label: 'Group', num: true, value: a?.group_id, options: S.groups.map(g => [g.id, `${g.name} (${g.type})`]) }, { k: 'opening_balance', label: 'Saldo awal (Rp, minus untuk utang)', type: 'number', value: a?.opening_balance ?? 0 }], !!a)
