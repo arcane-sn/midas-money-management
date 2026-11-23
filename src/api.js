@@ -5,6 +5,7 @@ import { isAuthed, sessionCookie, hasBearer, safeEqual, makeLimiter } from './au
 import { accountBalance, budgetStatus, totals } from './calc.js'
 import { addCategory, updateCategory, deleteCategory, addSub, updateSub, deleteSub, MSG } from './categories.js'
 import { createCapture, processCapture, defaultRunClaude } from './capture.js'
+import { createMcp } from './mcp.js'
 
 const PUBLIC = fileURLToPath(new URL('../public/', import.meta.url))
 const MONTH_NAV = fileURLToPath(new URL('./month-nav.js', import.meta.url))
@@ -35,6 +36,7 @@ async function readBody(req, limit) {
 
 export function createApp(db, { token, password, runClaude = defaultRunClaude, dataDir = 'data' }) {
   const limiter = makeLimiter()
+  const mcp = createMcp({ token, password })
   const send = (res, status, body, headers = {}) => {
     const isStr = typeof body === 'string' || Buffer.isBuffer(body)
     res.writeHead(status, { 'content-type': isStr ? 'text/plain' : 'application/json', 'x-content-type-options': 'nosniff', ...headers })
@@ -138,6 +140,7 @@ export function createApp(db, { token, password, runClaude = defaultRunClaude, d
     try {
       const url = new URL(req.url, 'http://x'), parts = url.pathname.split('/').filter(Boolean)
       if (parts[0] === 'api') return await api(req, res, url, parts)
+      if (parts[0] === 'mcp') return await mcp(req, res, parts[1])
       if (req.method !== 'GET') return send(res, 405, 'method not allowed')
       serveStatic(res, url.pathname)
     } catch (e) {

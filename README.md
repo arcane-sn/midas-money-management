@@ -14,3 +14,8 @@ Personal finance: double-tap iPhone after paying → transaction recorded. Spec/
 3. Double-tap on the payment-success screen (BCA, Jago, GoPay, OVO). Items flagged `review` in the app need a quick look.
 
 Cash is entered manually in the app. Auto-debits: Settings → Recurring.
+
+## MCP
+
+`POST /mcp` is a stateless MCP server (Streamable HTTP) exposing the whole REST API as tools (accounts, groups, categories, transactions, recurring, captures, summary).
+Auth: `Authorization: Bearer <MIDAS_TOKEN>`, or put the token in the path (`/mcp/<MIDAS_TOKEN>`) for clients that can't send headers (claude.ai custom connectors).
