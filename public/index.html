@@ -16,17 +16,18 @@
 body{margin:0;background:var(--color-bg);color:var(--txt);font:15px 'Plus Jakarta Sans',sans-serif;font-variant-numeric:tabular-nums;-webkit-text-size-adjust:100%}
 button,input,select,.num,.amt,time{font-family:inherit;font-variant-numeric:tabular-nums}
 #app{max-width:var(--layout-width);margin:0 auto;overflow-x:hidden;min-height:100vh;display:flex;flex-direction:column}
-header .brand{display:inline-flex;align-items:center;gap:8px;font-weight:800;font-size:18px;letter-spacing:.14em;color:var(--color-primary)}
-header .brand svg{width:30px;height:30px;filter:drop-shadow(0 2px 4px #1e5a4344)}
-.brand .word{display:inline-flex}
-.brand .l{display:inline-block}
-.brand.intro .sq{transform-box:fill-box;transform-origin:center;animation:bSq .22s ease-out both;animation-delay:calc(0ms - var(--e))}
-.brand.intro .coin{transform-box:fill-box;transform-origin:center;animation:bCoin .4s cubic-bezier(.3,1.5,.5,1) both;animation-delay:calc(.18s - var(--e))}
-.brand.intro .l{animation:bLet .2s ease-out both;animation-delay:calc(.5s + var(--i) * .07s - var(--e))}
+#splash{position:fixed;inset:0;z-index:100;background:var(--color-bg);display:flex;align-items:center;justify-content:center;transition:opacity .35s ease}
+#splash.out{opacity:0;pointer-events:none}
+#splash .brand{display:inline-flex;align-items:center;gap:14px;font-weight:800;font-size:30px;letter-spacing:.14em;color:var(--color-primary)}
+#splash svg{width:72px;height:72px;filter:drop-shadow(0 6px 12px #1e5a4344)}
+#splash .word{display:inline-flex}#splash .l{display:inline-block}
+#splash .sq{transform-box:fill-box;transform-origin:center;animation:bSq .22s ease-out both}
+#splash .coin{transform-box:fill-box;transform-origin:center;animation:bCoin .4s cubic-bezier(.3,1.5,.5,1) .18s both}
+#splash .l{animation:bLet .2s ease-out both;animation-delay:calc(.5s + var(--i) * .07s)}
+@media (prefers-reduced-motion:reduce){#splash *{animation:none!important}}
 @keyframes bSq{from{opacity:0;transform:scale(.7)}to{opacity:1;transform:none}}
 @keyframes bCoin{0%{opacity:0;transform:translateY(-26px) scale(.7)}60%{opacity:1}100%{opacity:1;transform:none}}
 @keyframes bLet{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:none}}
-@media (prefers-reduced-motion:reduce){.brand.intro *{animation:none!important}}
 header{padding:14px 14px 8px;text-align:center;font-weight:600;font-size:17px;position:sticky;top:0;background:var(--bg);z-index:2}
 main{flex:1;padding-bottom:90px}
 button,input,select{font:inherit;color:inherit}
@@ -230,8 +231,9 @@ nav button.on{color:var(--red)}nav button i{display:block;font-style:normal;font
 </style>
 </head>
 <body>
+<div id="splash" aria-label="MIDAS" role="img"><span class="brand"><svg viewBox="0 0 32 32" aria-hidden="true"><rect class="sq" width="32" height="32" rx="9" fill="#1e5a43"/><g class="coin"><circle cx="16" cy="16" r="10" fill="#f5b301"/><circle cx="16" cy="16" r="7.6" fill="none" stroke="#c98a0b" stroke-width="1"/><path d="M11.2 21V11l4.8 6 4.8-6v10" fill="none" stroke="#1e5a43" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></g></svg><span class="word" aria-hidden="true"><span class="l" style="--i:0">M</span><span class="l" style="--i:1">I</span><span class="l" style="--i:2">D</span><span class="l" style="--i:3">A</span><span class="l" style="--i:4">S</span></span></span></div>
 <div id="app"></div>
-<nav id="bottom-nav" aria-label="Navigasi utama"><div class="bn-inner">
+<nav id="bottom-nav" aria-label="Main navigation"><div class="bn-inner">
 <button class="bn-tab active" data-tab="ledger"><svg viewBox="0 0 24 24"><path d="M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3z"/><path d="M9 9h6M9 13h6"/></svg><span>Home</span></button>
 <button class="bn-tab" data-tab="insights"><svg viewBox="0 0 24 24"><path d="M5 20V11M12 20V5M19 20v-6"/></svg><span>Insights</span></button>
 <button class="bn-new" data-a="new-tx" aria-label="New transaction"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button>
@@ -299,15 +301,8 @@ const family = id => { const c = cat(id); return c ? (c.parent_id ?? c.id) : nul
 const monthLabel = m => new Date(m + '-01T00:00:00').toLocaleDateString('en-GB', { month: 'short', year: 'numeric' })
 const sign = { income: 'in', expense: 'ex', transfer: '' }
 
-// Logo intro: only plays right after page load; negative delays fast-forward re-renders inside the window
-const INTRO_MS = 1400
-const brandHtml = () => {
-  const e = performance.now(), on = e < INTRO_MS
-  const letters = [...'MIDAS'].map((c, i) => `<span class="l" style="--i:${i}">${c}</span>`).join('')
-  return `<span class="brand${on ? ' intro' : ''}" style="--e:${on ? Math.round(e) : 0}ms" aria-label="MIDAS"><svg viewBox="0 0 32 32" aria-hidden="true"><rect class="sq" width="32" height="32" rx="9" fill="#1e5a43"/><g class="coin"><circle cx="16" cy="16" r="10" fill="#f5b301"/><circle cx="16" cy="16" r="7.6" fill="none" stroke="#c98a0b" stroke-width="1"/><path d="M11.2 21V11l4.8 6 4.8-6v10" fill="none" stroke="#1e5a43" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></g></svg><span class="word" aria-hidden="true">${letters}</span></span>`
-}
 function render() {
-  const titles = { trans: brandHtml(), stats: 'Stats', accts: '', more: 'Settings' }
+  const titles = { trans: '', stats: 'Stats', accts: '', more: 'Settings' }
   const body = S.status !== 'ready' ? vState() : ({ trans: vTrans, stats: vStats, accts: vAccts, more: vMore }[S.tab] || vPlaceholder)()
   document.querySelectorAll('#bottom-nav .bn-tab').forEach(b => b.classList.toggle('active', TAB_MAP[b.dataset.tab] === S.tab))
   $('#app').innerHTML = `<header>${titles[S.tab] ?? ''}</header><main>${body}</main>`
@@ -864,6 +859,7 @@ const A = {
 }
 $('#app').onclick = e => { const t = e.target.closest('[data-a]'); if (t) guard(A[t.dataset.a])(t.dataset) }
 window.addEventListener('popstate', () => { if (S.sub) { S.sub = null; S.tab = 'more'; render() } })
+setTimeout(() => { const sp = $('#splash'); sp.classList.add('out'); setTimeout(() => sp.remove(), 400) }, 1300)
 load()
 </script>
 </body>
