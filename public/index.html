@@ -43,6 +43,14 @@ button{background:none;border:0;cursor:pointer;padding:0}
 .scard .two div{background:#ffffff1f;border-radius:16px;padding:10px 12px;font-size:11px}
 .scard .two div span{opacity:.75}
 .scard .two b{display:block;font-size:15px;margin-top:2px}
+.scard .two .inc{background:#4ade8026}
+.scard .two .exp{background:#f8717126}
+.scard .two .lbl{display:flex;align-items:center;gap:6px;opacity:1}
+.scard .two .lbl i{display:grid;place-items:center;width:18px;height:18px;border-radius:50%}
+.scard .two .inc .lbl i{background:#4ade80;color:#0f3d2b}
+.scard .two .exp .lbl i{background:#fca5a5;color:#7f1d1d}
+.scard .two .lbl svg{width:11px;height:11px;fill:none;stroke:currentColor;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.scard .two .lbl em{font-style:normal;opacity:.85}
 .dayw{padding:0 20px}
 .day{display:flex;justify-content:space-between;align-items:baseline;padding:20px 4px 10px;font-size:14px;font-weight:700}
 .day span+span{font-size:13px;font-weight:400;color:var(--mut)}
@@ -212,7 +220,7 @@ const monthLabel = m => new Date(m + '-01T00:00:00').toLocaleDateString('id-ID',
 const sign = { income: 'in', expense: 'ex', transfer: '' }
 
 function render() {
-  const titles = { trans: `<span class="brand"><svg viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="9" fill="#1e5a43"/><circle cx="16" cy="16" r="10" fill="#f5b301"/><circle cx="16" cy="16" r="7.6" fill="none" stroke="#c98a0b" stroke-width="1"/><text x="16" y="20.4" font-size="12" font-family="Plus Jakarta Sans,sans-serif" font-weight="800" text-anchor="middle" fill="#1e5a43">M</text></svg>MIDAS</span>`, stats: 'Stats', accts: 'Accounts', more: 'Settings' }
+  const titles = { trans: `<span class="brand"><svg viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="9" fill="#1e5a43"/><circle cx="16" cy="16" r="10" fill="#f5b301"/><circle cx="16" cy="16" r="7.6" fill="none" stroke="#c98a0b" stroke-width="1"/><text x="16" y="16.6" font-size="12" font-family="Plus Jakarta Sans,sans-serif" font-weight="800" text-anchor="middle" dominant-baseline="central" fill="#1e5a43">M</text></svg>MIDAS</span>`, stats: 'Stats', accts: 'Accounts', more: 'Settings' }
   const body = S.status !== 'ready' ? vState() : ({ trans: vTrans, stats: vStats, accts: vAccts, more: vMore }[S.tab] || vPlaceholder)()
   document.querySelectorAll('#bottom-nav .bn-tab').forEach(b => b.classList.toggle('active', TAB_MAP[b.dataset.tab] === S.tab))
   $('#app').innerHTML = `<header>${titles[S.tab] ?? ''}</header><main>${body}</main>`
@@ -244,7 +252,7 @@ function spentCard(pending) {
     `<span>${esc(monthLabel(S.month))}</span>` +
     `<button data-a="mon" data-v="1" aria-label="Bulan depan"${canNext ? '' : ' disabled'}><svg viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></button></div></div>` +
     `<div class="big num"><small>Rp</small>${pending ? '—' : (net < 0 ? '−' : '') + fmt(Math.abs(net))}</div>` +
-    `<div class="two"><div><span>Income</span><b class="num">${pending ? '—' : fmt(inc)}</b></div><div><span>Expense</span><b class="num">${pending ? '—' : fmt(exp)}</b></div></div></div>`
+    `<div class="two"><div class="inc"><span class="lbl"><i><svg viewBox="0 0 24 24"><path d="M12 19V5M5 12l7-7 7 7"/></svg></i><em>Income</em></span><b class="num">${pending ? '—' : fmt(inc)}</b></div><div class="exp"><span class="lbl"><i><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12l7 7 7-7"/></svg></i><em>Expense</em></span><b class="num">${pending ? '—' : fmt(exp)}</b></div></div></div>`
 }
 
 function vTrans() {
