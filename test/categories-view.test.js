@@ -26,7 +26,7 @@ test('badge only when category has subs; sub names listed', () => {
 })
 
 test('empty state when no categories of the type', () => {
-  assert.ok(V.render({ cats: [], type: 'income' }).includes('Belum ada kategori'))
+  assert.ok(V.render({ cats: [], type: 'income' }).includes('No categories yet'))
 })
 
 test('names are escaped; Uncategorized listed last', () => {

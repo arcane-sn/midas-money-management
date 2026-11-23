@@ -23,9 +23,9 @@
         const n = c.subs.length
         const subs = n ? `<small>${c.subs.map(s => esc(s.name)).join(', ')}</small>` : ''
         return `<div class="row cat-row"${c.is_system ? '' : ` data-a="catEdit" data-id="${c.id}"`}><div class="ico" aria-hidden="true">${icon(c.name, c.icon)}</div>` +
-          `<div class="n"><span>${esc(c.name)}</span>${subs}</div>${n ? `<span class="badge" aria-label="${n} sub-kategori">${n}</span>` : '<span></span>'}</div>`
+          `<div class="n"><span>${esc(c.name)}</span>${subs}</div>${n ? `<span class="badge" aria-label="${n} sub-categories">${n}</span>` : '<span></span>'}</div>`
       }).join('')
-      : '<div class="empty">Belum ada kategori.</div>'
+      : '<div class="empty">No categories yet.</div>'
     return tabs(type) + rows
   }
 

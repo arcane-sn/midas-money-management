@@ -30,7 +30,7 @@
       ? `<div style="font-size:13px;color:${MUTED};margin:16px 0 8px">${esc(sel.name)}</div><div style="display:flex;flex-wrap:wrap;gap:8px">${subs.map(s => `<button data-nf="sub" data-v="${s.id}" aria-pressed="${sub === s.id}" style="height:36px;padding:0 14px;border-radius:999px;font-size:13px;font-weight:500;${pill(sub === s.id)}">${esc(s.name)}</button>`).join('')}</div>`
       : ''
     const errHtml = error ? `<div role="alert" style="color:#c0392b;font-size:12px;margin-top:6px">${esc(error)}</div>` : ''
-    return `<div style="padding:20px 20px 0"><div style="font-size:14px;font-weight:700;margin-bottom:10px">Kategori</div><div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px">${grid}</div>${errHtml}${subHtml}</div>`
+    return `<div style="padding:20px 20px 0"><div style="font-size:14px;font-weight:700;margin-bottom:10px">Category</div><div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px">${grid}</div>${errHtml}${subHtml}</div>`
   }
 
   globalThis.CategoryPicker = { categoryOptions, subOptions, selectCategory, selectSub, render }

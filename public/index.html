@@ -247,14 +247,14 @@ async function api(method, path, body) {
   if (r.status === 401) { showLogin(); throw new Error('auth') }
   const j = await r.json(); if (!r.ok) throw new Error(j.error || r.status); return j
 }
-const guard = fn => async (...a) => { try { await fn(...a) } catch (e) { if (e.message !== 'auth') alert('Gagal: ' + e.message) } }
+const guard = fn => async (...a) => { try { await fn(...a) } catch (e) { if (e.message !== 'auth') alert('Error: ' + e.message) } }
 
 function showLogin(msg = '') {
   $('#app').innerHTML = `<form class="login"><h2>MIDAS</h2><input type="password" name="pw" placeholder="Password" autocomplete="current-password" autofocus><div class="err">${esc(msg)}</div><button>Masuk</button></form>`
   $('form').onsubmit = async e => {
     e.preventDefault()
     const r = await fetch('/api/login', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ password: e.target.pw.value }) })
-    if (r.ok) load(); else showLogin(r.status === 429 ? 'Terlalu banyak percobaan, coba lagi nanti' : 'Password salah')
+    if (r.ok) load(); else showLogin(r.status === 429 ? 'Too many attempts, try again later' : 'Wrong password')
   }
 }
 
@@ -275,23 +275,23 @@ async function load() {
   }
 }
 
-const skeleton = (hero, n = 5) => `<div class="skel" role="status" aria-label="Memuat">${hero ? '<i class="h"></i>' : ''}${'<i></i>'.repeat(n)}</div>`
+const skeleton = (hero, n = 5) => `<div class="skel" role="status" aria-label="Loading">${hero ? '<i class="h"></i>' : ''}${'<i></i>'.repeat(n)}</div>`
 function vState() {
   const bar = S.tab === 'trans' ? spentCard(true) : ''
   const cls = S.tab === 'trans' ? 'tempty' : 'empty'
   if (S.status === 'loading') return skeleton(S.tab === 'trans')
-  return bar + `<div class="${cls}" role="alert">Gagal memuat data${S.error ? ': ' + esc(S.error) : ''}<br><button data-a="retry">Coba lagi</button></div>`
+  return bar + `<div class="${cls}" role="alert">Failed to load data${S.error ? ': ' + esc(S.error) : ''}<br><button data-a="retry">Try again</button></div>`
 }
 
 const cat = id => S.cats.find(c => c.id === id)
 const catName = id => { const c = cat(id); if (!c) return '—'; const p = cat(c.parent_id); return p ? `${p.name} › ${c.name}` : c.name }
 const acc = id => S.accts.find(a => a.id === id)?.name ?? '?'
 const family = id => { const c = cat(id); return c ? (c.parent_id ?? c.id) : null }
-const monthLabel = m => new Date(m + '-01T00:00:00').toLocaleDateString('id-ID', { month: 'short', year: 'numeric' })
+const monthLabel = m => new Date(m + '-01T00:00:00').toLocaleDateString('en-GB', { month: 'short', year: 'numeric' })
 const sign = { income: 'in', expense: 'ex', transfer: '' }
 
 function render() {
-  const titles = { trans: `<span class="brand"><svg viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="9" fill="#1e5a43"/><circle cx="16" cy="16" r="10" fill="#f5b301"/><circle cx="16" cy="16" r="7.6" fill="none" stroke="#c98a0b" stroke-width="1"/><text x="16" y="16.6" font-size="12" font-family="Plus Jakarta Sans,sans-serif" font-weight="800" text-anchor="middle" dominant-baseline="central" fill="#1e5a43">M</text></svg>MIDAS</span>`, stats: 'Stats', accts: '', more: 'Settings' }
+  const titles = { trans: `<span class="brand"><svg viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="9" fill="#1e5a43"/><circle cx="16" cy="16" r="10" fill="#f5b301"/><circle cx="16" cy="16" r="7.6" fill="none" stroke="#c98a0b" stroke-width="1"/><path d="M11.2 21V11l4.8 6 4.8-6v10" fill="none" stroke="#1e5a43" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>MIDAS</span>`, stats: 'Stats', accts: '', more: 'Settings' }
   const body = S.status !== 'ready' ? vState() : ({ trans: vTrans, stats: vStats, accts: vAccts, more: vMore }[S.tab] || vPlaceholder)()
   document.querySelectorAll('#bottom-nav .bn-tab').forEach(b => b.classList.toggle('active', TAB_MAP[b.dataset.tab] === S.tab))
   $('#app').innerHTML = `<header>${titles[S.tab] ?? ''}</header><main>${body}</main>`
@@ -299,7 +299,7 @@ function render() {
 
 // bottom-nav tab -> layar (S.tab); layar yang belum ada jatuh ke placeholder
 const TAB_MAP = { ledger: 'trans', insights: 'stats', accounts: 'accts', more: 'more' }
-const vPlaceholder = () => '<div class="empty">Segera hadir</div>'
+const vPlaceholder = () => '<div class="empty">Coming soon</div>'
 $('#bottom-nav').onclick = e => {
   if (e.target.closest('.bn-new')) {
     if (!S.sum || S.status !== 'ready') return
@@ -312,17 +312,17 @@ $('#bottom-nav').onclick = e => {
   if (S.tab === 'accts' && S.status === 'ready') refreshAccts()
 }
 
-const monthBar = () => `<div class="mnav"><button data-a="mon" data-v="-1" aria-label="Bulan lalu">‹</button><b>${formatMonthLabel(S.month)}</b><button data-a="mon" data-v="1" aria-label="Bulan depan"${canGoNext(S.month, today().slice(0, 7)) ? '' : ' disabled'}>›</button></div>`
+const monthBar = () => `<div class="mnav"><button data-a="mon" data-v="-1" aria-label="Previous month">‹</button><b>${formatMonthLabel(S.month, 'en-GB')}</b><button data-a="mon" data-v="1" aria-label="Next month"${canGoNext(S.month, today().slice(0, 7)) ? '' : ' disabled'}>›</button></div>`
 const sumOf = kind => S.txs.filter(t => t.kind === kind).reduce((s, t) => s + t.amount, 0)
 
-const monthLong = m => new Date(m + '-01T00:00:00').toLocaleDateString('id-ID', { month: 'long' })
+const monthLong = m => new Date(m + '-01T00:00:00').toLocaleDateString('en-GB', { month: 'long' })
 function spentCard(pending) {
   const inc = sumOf('income'), exp = sumOf('expense'), net = inc - exp
   const canNext = S.month < today().slice(0, 7)
   return `<div class="scard"><div class="top"><span class="ttl">Net in ${esc(monthLong(S.month))}</span><div class="pn">` +
-    `<button data-a="mon" data-v="-1" aria-label="Bulan lalu"><svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></button>` +
+    `<button data-a="mon" data-v="-1" aria-label="Previous month"><svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></button>` +
     `<span>${esc(monthLabel(S.month))}</span>` +
-    `<button data-a="mon" data-v="1" aria-label="Bulan depan"${canNext ? '' : ' disabled'}><svg viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></button></div></div>` +
+    `<button data-a="mon" data-v="1" aria-label="Next month"${canNext ? '' : ' disabled'}><svg viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></button></div></div>` +
     `<div class="big num"><small>Rp</small>${pending ? '—' : (net < 0 ? '−' : '') + fmt(Math.abs(net))}</div>` +
     `<div class="two"><div class="inc"><span class="lbl"><i><svg viewBox="0 0 24 24"><path d="M12 19V5M5 12l7-7 7 7"/></svg></i><em>Income</em></span><b class="num">${pending ? '—' : fmt(inc)}</b></div><div class="exp"><span class="lbl"><i><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12l7 7 7-7"/></svg></i><em>Expense</em></span><b class="num">${pending ? '—' : fmt(exp)}</b></div></div></div>`
 }
@@ -336,7 +336,7 @@ function vTrans() {
       if (open) html += '</div></div>'
       last = t.date; open = true; const day = S.txs.filter(x => x.date === t.date)
       const net = day.reduce((s, x) => s + (x.kind === 'income' ? x.amount : x.kind === 'expense' ? -x.amount : 0), 0)
-      html += `<div class="dayw"><div class="day"><span>${new Date(t.date + 'T00:00:00').toLocaleDateString('id-ID', { day: 'numeric', month: 'short', weekday: 'short' })}</span><span class="num">${net < 0 ? '−' : ''}${fmt(Math.abs(net))}</span></div><div class="dcard">`
+      html += `<div class="dayw"><div class="day"><span>${new Date(t.date + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short', weekday: 'short' })}</span><span class="num">${net < 0 ? '−' : ''}${fmt(Math.abs(net))}</span></div><div class="dcard">`
     }
     const c = cat(t.category_id), parent = cat(c?.parent_id)
     const top = t.kind === 'transfer' ? 'Transfer' : (parent?.name ?? c?.name ?? '—')
@@ -354,7 +354,7 @@ function vStats() {
   const pill = (a, v, l) => `<button data-a="${a}" data-v="${v}" class="${(a === 'sTab' ? S.sTab : S.stKind) === v ? 'on' : ''}">${l}</button>`
   const head = `<div class="st"><div class="st-pill">${pill('sTab', 'stats', 'Stats')}${pill('sTab', 'budget', 'Budget')}</div>` + monthBar()
   // Budget: placeholder saja (isi dikerjakan di tiket terpisah); S.month dibagikan antar tab
-  if (S.sTab === 'budget') return head + '<div class="empty">Budget segera hadir</div></div>'
+  if (S.sTab === 'budget') return head + '<div class="empty">Budget coming soon</div></div>'
   return head + vStatsBody() + '</div>'
 }
 
@@ -362,9 +362,9 @@ function vStatsBody() {
   const kind = S.stKind
   const by = new Map(); let total = 0
   for (const t of S.txs.filter(t => t.kind === kind)) { const k = family(t.category_id); by.set(k, (by.get(k) ?? 0) + t.amount); total += t.amount }
-  const toggle = `<div class="st-pill" style="margin-top:8px"><button data-a="stKind" data-v="expense" class="${kind === 'expense' ? 'on' : ''}">Pengeluaran</button><button data-a="stKind" data-v="income" class="${kind === 'income' ? 'on' : ''}">Pemasukan</button></div>`
-  if (!by.size) return toggle + `<div class="st-card empty" style="padding:40px 20px">Belum ada ${kind === 'expense' ? 'pengeluaran' : 'pemasukan'} bulan ini.</div>`
-  const rows = [...by].map(([k, v]) => [cat(k)?.name ?? 'Tanpa kategori', v]).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+  const toggle = `<div class="st-pill" style="margin-top:8px"><button data-a="stKind" data-v="expense" class="${kind === 'expense' ? 'on' : ''}">Expenses</button><button data-a="stKind" data-v="income" class="${kind === 'income' ? 'on' : ''}">Income</button></div>`
+  if (!by.size) return toggle + `<div class="st-card empty" style="padding:40px 20px">No ${kind === 'expense' ? 'expenses' : 'income'} this month.</div>`
+  const rows = [...by].map(([k, v]) => [cat(k)?.name ?? 'Uncategorized', v]).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
   const R = 54, C = 2 * Math.PI * R; let off = 0
   const arcs = rows.map(([, v], i) => {
     const len = v / total * C
@@ -372,8 +372,8 @@ function vStatsBody() {
     off += len; return a
   }).join('')
   const days = new Date(+S.month.slice(0, 4), +S.month.slice(5), 0).getDate()
-  const hero = `<div class="st-card"><div class="st-hero"><div class="st-donut"><svg viewBox="0 0 132 132"><circle class="trk" cx="66" cy="66" r="${R}"/>${arcs}</svg><div class="ctr"><span>${rows.length} kategori</span><b>${Math.round(rows[0][1] / total * 100)}%</b></div></div>` +
-    `<div class="st-meta"><small>Total ${kind === 'expense' ? 'pengeluaran' : 'pemasukan'}</small><div class="tot num"><small>Rp</small>${fmt(total)}</div><span class="st-chip">≈ ${fmt(Math.round(total / days))} / hari</span></div></div></div>`
+  const hero = `<div class="st-card"><div class="st-hero"><div class="st-donut"><svg viewBox="0 0 132 132"><circle class="trk" cx="66" cy="66" r="${R}"/>${arcs}</svg><div class="ctr"><span>${rows.length} categories</span><b>${Math.round(rows[0][1] / total * 100)}%</b></div></div>` +
+    `<div class="st-meta"><small>Total ${kind === 'expense' ? 'expenses' : 'income'}</small><div class="tot num"><small>Rp</small>${fmt(total)}</div><span class="st-chip">≈ ${fmt(Math.round(total / days))} / day</span></div></div></div>`
   const list = `<div class="st-card" style="padding:8px 20px">` + rows.map(([name, v], i) => {
     const col = ST_COLORS[i % ST_COLORS.length], pc = v / total * 100
     return `<div class="st-row" style="color:${col}"><div class="ic" style="background:${col}1f" aria-hidden="true">${categoryIcon(name)}</div><div style="min-width:0"><div class="nm" style="color:var(--txt)">${esc(name)}</div><div class="bar"><i style="width:${pc}%"></i></div></div><div class="am"><b style="color:var(--txt)" class="num">${fmt(v)}</b><small>${Math.round(pc)}%</small></div></div>`
@@ -386,7 +386,7 @@ function vAcctDetail() {
   const liab = a.type === 'liability'
   let list
   if (S.acctTxs === null) list = skeleton(false, 4)
-  else if (!S.acctTxs.length) list = '<div class="tempty" style="margin:16px 0">Belum ada transaksi di akun ini.</div>'
+  else if (!S.acctTxs.length) list = '<div class="tempty" style="margin:16px 0">No transactions in this account yet.</div>'
   else {
     list = '<div class="dcard" style="margin-top:12px">' + S.acctTxs.map(t => {
       const c = cat(t.category_id), parent = cat(c?.parent_id)
@@ -408,21 +408,21 @@ async function openAcct(id) {
 function vAccts() {
   if (S.acctView) return vAcctDetail()
   let list
-  if (S.acctsErr) list = `<div class="empty" role="alert">Gagal memuat akun<br><button data-a="acctsRetry">Coba lagi</button></div>`
-  else if (!S.accts.length) list = '<div class="empty">Belum ada akun.</div>'
+  if (S.acctsErr) list = `<div class="empty" role="alert">Failed to load accounts<br><button data-a="acctsRetry">Try again</button></div>`
+  else if (!S.accts.length) list = '<div class="empty">No accounts yet.</div>'
   else {
     const t = S.sum?.totals
     const rp = n => (n < 0 ? '−' : '') + 'Rp ' + fmt(Math.abs(Math.round(n)))
     const AV = ['#1e5a43', '#3b82f6', '#8b5cf6', '#f97316', '#14b8a6', '#e11d48', '#c98a0b']
     list = t ? `<div class="ac-hero"><small>Net Worth</small><div class="nw num"><small>${t.total < 0 ? '−' : ''}Rp</small>${fmt(Math.abs(Math.round(t.total)))}</div><div class="two"><div class="a"><span class="lbl"><i><svg viewBox="0 0 24 24"><path d="M12 19V5M5 12l7-7 7 7"/></svg></i><em>Assets</em></span><b class="num">${fmt(Math.round(t.assets))}</b></div><div class="l"><span class="lbl"><i><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12l7 7 7-7"/></svg></i><em>Liabilities</em></span><b class="num">${fmt(Math.round(t.liabilities))}</b></div></div></div>` : ''
-    for (const g of [...S.groups, { id: null, name: 'Lainnya', type: 'asset' }].sort((a, b) => (b.type === 'liability') - (a.type === 'liability'))) {
+    for (const g of [...S.groups, { id: null, name: 'Other', type: 'asset' }].sort((a, b) => (b.type === 'liability') - (a.type === 'liability'))) {
       const items = S.accts.filter(a => (a.group_id ?? null) === g.id); if (!items.length) continue
       const liab = g.type === 'liability', gs = items.reduce((n, a) => n + a.balance, 0)
       list += `<div class="ac-gh${liab ? ' liab' : ''}"><span>${esc(g.name)}${liab ? ' · Liability' : ''}</span><b class="num">${rp(gs)}</b></div><div class="ac-card">` +
         items.map((a, i) => { const col = liab ? '#c0392b' : AV[(a.id ?? i) % AV.length]; return `<div class="ac-row" role="button" tabindex="0" data-a="acctOpen" data-id="${a.id}"><div class="ac-av" style="background:${col}1f;color:${col}">${esc(a.name.slice(0, 2).toUpperCase())}</div><span class="ac-nm">${esc(a.name)}</span><b class="num ac-bal ${a.balance < 0 ? 'ex' : ''}">${rp(a.balance)}</b></div>` }).join('') + '</div>'
     }
   }
-  return `<section class="ac" aria-label="Accounts"><div class="ac-top"><h1>Accounts</h1><button data-a="accAdd" aria-label="Tambah akun"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Akun</button></div><div id="accts-list">${list}</div></section>`
+  return `<section class="ac" aria-label="Accounts"><div class="ac-top"><h1>Accounts</h1><button data-a="accAdd" aria-label="Add account"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Account</button></div><div id="accts-list">${list}</div></section>`
 }
 
 // Ambil ulang data akun dari GET /api/summary setiap layar Accounts dibuka (tanpa cache)
@@ -444,22 +444,22 @@ document.addEventListener('click', e => { if (e.target.closest('[data-a="acctsRe
 function vAcctsLegacy() {
   const t = S.sum.totals
   let html = `<div class="sum"><div>Assets<b class="num in">${fmt(t.assets)}</b></div><div>Liabilities<b class="num ex">${fmt(t.liabilities)}</b></div><div>Net Worth<b class="num ${t.total < 0 ? 'ex' : ''}">${fmt(t.total)}</b></div></div>`
-  const groups = [...S.groups, { id: null, name: 'Lainnya', type: 'asset' }]
+  const groups = [...S.groups, { id: null, name: 'Other', type: 'asset' }]
   for (const g of groups) {
     const list = S.accts.filter(a => (a.group_id ?? null) === g.id); if (!list.length) continue
     const gs = list.reduce((s, a) => s + a.balance, 0)
     html += `<div class="grp"><span>${esc(g.name)} · ${g.type === 'asset' ? 'Asset' : 'Liability'}</span><span class="num ${gs < 0 ? 'ex' : 'in'}">${fmt(gs)}</span></div>` +
       list.map(a => `<div class="row"><div class="n">${esc(a.name)}</div><div class="num ${a.balance < 0 ? 'ex' : 'in'}">${fmt(a.balance)}</div></div>`).join('')
   }
-  return html + (S.accts.length ? '' : '<div class="empty">Belum ada account — tambah di More › Accounts</div>')
+  return html + (S.accts.length ? '' : '<div class="empty">No accounts yet — add one in More › Accounts</div>')
 }
 
 // Layar Groups v2: daftar grup (nama + tipe) dari GET /api/groups
 function vGroups() {
   let list
-  if (S.groupsErr) list = `<div class="empty" role="alert">Gagal memuat grup<br><button data-a="groupsRetry">Coba lagi</button></div>`
+  if (S.groupsErr) list = `<div class="empty" role="alert">Failed to load groups<br><button data-a="groupsRetry">Try again</button></div>`
   else if (S.groupsLoading && !S.groups.length) list = skeleton(false, 4)
-  else if (!S.groups.length) list = '<div class="empty">Belum ada grup.</div>'
+  else if (!S.groups.length) list = '<div class="empty">No groups yet.</div>'
   else list = S.groups.map(g => `<div class="acct-item" role="button" tabindex="0" data-a="grpEdit" data-id="${g.id}"><span class="acct-name">${esc(g.name)}</span><span class="badge${g.type === 'liability' ? ' r' : ''}">${g.type === 'liability' ? 'Liability' : 'Asset'}</span></div>`).join('')
   return `<section class="accts-v2" aria-label="Groups"><div class="sec" style="margin:0 -20px"><button data-a="back">‹ Back</button><button data-a="grpAdd">+ Group</button></div><h1 class="accts-title">Groups</h1><div class="accts-list">${list}</div></section>`
 }
@@ -486,10 +486,10 @@ document.addEventListener('click', e => { if (e.target.closest('[data-a="groupsR
 // Layar Recurring v2: daftar transaksi berulang dari GET /api/recurring
 function vRecurring() {
   let list
-  if (S.recErr) list = `<div class="empty" role="alert">Gagal memuat recurring<br><button data-a="recRetry">Coba lagi</button></div>`
+  if (S.recErr) list = `<div class="empty" role="alert">Failed to load recurring<br><button data-a="recRetry">Try again</button></div>`
   else if (S.recLoading && !S.rec.length) list = skeleton(false, 4)
   else if (!S.rec.length) list = '<div class="rec-empty"><span class="ico"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="m17 2 4 4-4 4"></path><path d="M3 11v-1a4 4 0 0 1 4-4h14"></path><path d="m7 22-4-4 4-4"></path><path d="M21 13v1a4 4 0 0 1-4 4H3"></path></svg></span><div class="t">No recurring transactions yet</div><div class="d">Add installments and subscriptions once. They’re created automatically each month.</div><button data-a="recAdd">+ Add recurring</button></div>'
-  else list = S.rec.map(r => `<div class="acct-item" role="button" tabindex="0" data-a="recEdit" data-id="${r.id}"><span style="min-width:0"><b>${esc(r.note || '—')}</b><br><span class="mut">${esc(acc(r.account_id))} · ${esc(catName(r.category_id))}<br>Tiap tgl ${esc(r.day_of_month)} · Last run: ${r.last_run ? esc(r.last_run) : '—'}</span></span><span style="text-align:right"><b class="num ${r.kind === 'income' ? 'in' : 'ex'}">${r.kind === 'income' ? '+' : '−'}${fmt(r.amount)}</b><br><span class="badge${r.active ? '' : ' r'}">${r.active ? 'Aktif' : 'Nonaktif'}</span> <span class="badge">${r.kind === 'income' ? 'Income' : 'Expense'}</span></span></div>`).join('')
+  else list = S.rec.map(r => `<div class="acct-item" role="button" tabindex="0" data-a="recEdit" data-id="${r.id}"><span style="min-width:0"><b>${esc(r.note || '—')}</b><br><span class="mut">${esc(acc(r.account_id))} · ${esc(catName(r.category_id))}<br>Every day ${esc(r.day_of_month)} · Last run: ${r.last_run ? esc(r.last_run) : '—'}</span></span><span style="text-align:right"><b class="num ${r.kind === 'income' ? 'in' : 'ex'}">${r.kind === 'income' ? '+' : '−'}${fmt(r.amount)}</b><br><span class="badge${r.active ? '' : ' r'}">${r.active ? 'Active' : 'Inactive'}</span> <span class="badge">${r.kind === 'income' ? 'Income' : 'Expense'}</span></span></div>`).join('')
   return `<section class="accts-v2" aria-label="Recurring"><div class="v2-head"><button class="back" data-a="back" aria-label="Back"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"></path><path d="M19 12H5"></path></svg></button><h1 class="ttl">Recurring &amp; Auto Debit</h1>${S.rec.length ? '<button class="add" data-a="recAdd">+ Recurring</button>' : ''}</div><div class="accts-list">${list}</div></section>`
 }
 
@@ -512,21 +512,21 @@ async function refreshRecurring() {
 document.addEventListener('click', e => { if (e.target.closest('[data-a="recRetry"]')) refreshRecurring() })
 
 function vMore() {
-  if (S.sub === 'categories') return `<div class="sec"><button data-a="back">‹ Back</button><span>Kategori</span><button data-a="catAdd" data-kind="${S.sKind}">+ Kategori</button></div>` +
+  if (S.sub === 'categories') return `<div class="sec"><button data-a="back">‹ Back</button><span>Categories</span><button data-a="catAdd" data-kind="${S.sKind}">+ Category</button></div>` +
     CategoriesView.render({ cats: S.cats, type: S.sKind, icon: categoryIcon, esc })
   const ph = (t, m) => `<div class="sec"><button data-a="back">‹ Back</button><span>${t}</span></div><div class="empty">${m}</div>`
   if (S.sub === 'groups') return vGroups()
   if (S.sub === 'recurring') return vRecurring()
   const svg = p => `<svg viewBox="0 0 24 24">${p}</svg>`
   const items = {
-    categories: ['#1e5a43', svg('<path d="M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h7v7h-7z"/>'), 'Categories', 'Kategori dan sub-kategori'],
-    groups: ['#3b82f6', svg('<path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>'), 'Groups', 'Kelompok aset dan liabilitas'],
-    recurring: ['#f97316', svg('<path d="M17 2l4 4-4 4"/><path d="M3 11V9a3 3 0 0 1 3-3h15"/><path d="M7 22l-4-4 4-4"/><path d="M21 13v2a3 3 0 0 1-3 3H3"/>'), 'Recurring', 'Cicilan dan langganan']
+    categories: ['#1e5a43', svg('<path d="M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h7v7h-7z"/>'), 'Categories', 'Categories and sub-categories'],
+    groups: ['#3b82f6', svg('<path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>'), 'Groups', 'Asset and liability groups'],
+    recurring: ['#f97316', svg('<path d="M17 2l4 4-4 4"/><path d="M3 11V9a3 3 0 0 1 3-3h15"/><path d="M7 22l-4-4 4-4"/><path d="M21 13v2a3 3 0 0 1-3 3H3"/>'), 'Recurring', 'Installments and subscriptions']
   }
   const chev = '<svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg>'
   const mi = k => { const [c, ic, l, d] = items[k]; return `<button class="set-row" data-a="sub" data-v="${k}"><span class="set-ic" style="background:${c}1f;color:${c}">${ic}</span><span class="set-t"><b>${l}</b><small>${d}</small></span>${chev}</button>` }
   const out = '<svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>'
-  return `<div class="set"><h2>Kelola</h2><div class="set-card">${mi('categories')}${mi('groups')}${mi('recurring')}</div><button class="set-out" data-a="logout">${out}Keluar</button><div class="set-v">MIDAS</div></div>`
+  return `<div class="set"><h2>Manage</h2><div class="set-card">${mi('categories')}${mi('groups')}${mi('recurring')}</div><button class="set-out" data-a="logout">${out}Log out</button><div class="set-v">MIDAS</div></div>`
 }
 
 // ---------- generic sheet ----------
@@ -536,7 +536,7 @@ function ask(title, fields, canDel) {
     o.innerHTML = `<div class="sheet"><h3>${esc(title)}</h3>${fields.map((f, i) => `<label>${esc(f.label)}${f.options
       ? `<select data-i="${i}">${f.options.map(([v, l]) => `<option value="${esc(v)}"${String(v) === String(f.value) ? ' selected' : ''}>${esc(l)}</option>`).join('')}</select>`
       : `<input data-i="${i}" type="${f.type || 'text'}" value="${esc(f.value ?? '')}"${f.type === 'number' ? ' inputmode="numeric"' : ''}>`}</label>`).join('')}
-      <div class="btns"><button data-r="x">Batal</button>${canDel ? '<button data-r="d" class="danger">Hapus</button>' : ''}<button data-r="s" class="pri">Simpan</button></div></div>`
+      <div class="btns"><button data-r="x">Cancel</button>${canDel ? '<button data-r="d" class="danger">Delete</button>' : ''}<button data-r="s" class="pri">Save</button></div></div>`
     o.hidden = false
     o.onclick = e => {
       const r = e.target.dataset.r; if (!r && e.target !== o) return
@@ -551,38 +551,38 @@ function ask(title, fields, canDel) {
 function catSheet({ title, kind, c, parent, s }) {
   const o = $('#ov'), target = s ?? c, isSub = parent != null || !!s
   const showBudget = !isSub && (c?.kind ?? kind) === 'expense'
-  const subsHtml = c ? `<div class="sec"><span>Sub-kategori</span><button data-r="sa">+ Sub</button></div>` +
-    S.cats.filter(x => x.parent_id === c.id).map(x => `<div class="row"><div class="n">${esc(x.name)}</div><button data-r="se" data-id="${x.id}">Ubah</button><button data-r="sd" data-id="${x.id}" class="danger">Hapus</button></div>`).join('') : ''
+  const subsHtml = c ? `<div class="sec"><span>Sub-categories</span><button data-r="sa">+ Sub</button></div>` +
+    S.cats.filter(x => x.parent_id === c.id).map(x => `<div class="row"><div class="n">${esc(x.name)}</div><button data-r="se" data-id="${x.id}">Edit</button><button data-r="sd" data-id="${x.id}" class="danger">Delete</button></div>`).join('') : ''
   o.innerHTML = `<div class="sheet"><h3>${esc(title)}</h3>
-    <label>Nama<input name="name" value="${esc(target?.name ?? '')}" autocomplete="off" aria-describedby="cerr"></label>
+    <label>Name<input name="name" value="${esc(target?.name ?? '')}" autocomplete="off" aria-describedby="cerr"></label>
     ${isSub ? '' : `<label>Ikon<select name="icon">${Object.entries(ICON_CHOICES).map(([k, [l]]) => `<option value="${k}"${(c?.icon || 'tag') === k ? ' selected' : ''}>${l}</option>`).join('')}</select></label>`}
-    ${showBudget ? `<label>Budget per bulan (Rp)<input name="budget" type="number" inputmode="numeric" value="${esc(c?.monthly_budget ?? 0)}"></label>` : ''}
+    ${showBudget ? `<label>Monthly budget (Rp)<input name="budget" type="number" inputmode="numeric" value="${esc(c?.monthly_budget ?? 0)}"></label>` : ''}
     <div class="err" id="cerr" role="alert"></div>${subsHtml}
-    <div class="btns"><button data-r="x">Batal</button>${target ? '<button data-r="d" class="danger">Hapus</button>' : ''}<button data-r="s" class="pri">Simpan</button></div></div>`
+    <div class="btns"><button data-r="x">Cancel</button>${target ? '<button data-r="d" class="danger">Delete</button>' : ''}<button data-r="s" class="pri">Save</button></div></div>`
   o.hidden = false
   const err = m => { $('#cerr', o).textContent = m; $('[name=name]', o).setAttribute('aria-invalid', 'true') }
-  const reopen = async id => { await load(); const n = cat(id); n ? catSheet({ title: 'Edit kategori', c: n }) : (o.hidden = true) }
+  const reopen = async id => { await load(); const n = cat(id); n ? catSheet({ title: 'Edit category', c: n }) : (o.hidden = true) }
   o.onclick = async e => {
     const b = e.target.closest('[data-r]'); if (!b && e.target !== o) return
     const r = b?.dataset.r
     if (!r || r === 'x') { o.hidden = true; return }
     try {
-      if (r === 'sa') { o.hidden = true; return catSheet({ title: 'Sub-kategori baru', parent: c.id }) }
-      if (r === 'se') { const x = cat(+b.dataset.id); return catSheet({ title: 'Edit sub-kategori', parent: c.id, s: x }) }
+      if (r === 'sa') { o.hidden = true; return catSheet({ title: 'New sub-category', parent: c.id }) }
+      if (r === 'se') { const x = cat(+b.dataset.id); return catSheet({ title: 'Edit sub-category', parent: c.id, s: x }) }
       if (r === 'sd') {
         const x = cat(+b.dataset.id)
-        if (!confirm(`Hapus sub-kategori "${x.name}"?\nJika sudah dipakai transaksi, transaksinya tidak dihapus dan akan dipindah ke Uncategorized / Other.`)) return
+        if (!confirm(`Delete sub-category "${x.name}"?\nTransactions using it are kept and moved to Uncategorized / Other.`)) return
         await api('DELETE', 'categories/' + x.id); return reopen(c.id)
       }
       if (r === 'd') {
-        const what = isSub ? 'sub-kategori' : 'kategori'
-        if (!confirm(`Hapus ${what} "${target.name}"?\nJika sudah dipakai transaksi, transaksinya tidak dihapus dan akan dipindah ke Uncategorized / Other (budget dan account ikut dihitung ulang).`)) return
+        const what = isSub ? 'sub-category' : 'category'
+        if (!confirm(`Delete ${what} "${target.name}"?\nTransactions using it are kept and moved to Uncategorized / Other (budgets and account balances are recalculated).`)) return
         await api('DELETE', 'categories/' + target.id); o.hidden = true
         return isSub ? reopen(parent) : load()
       }
       if (r === 's') {
         const name = $('[name=name]', o).value.trim()
-        if (!name) return err('Nama tidak boleh kosong')
+        if (!name) return err('Name is required')
         const bv = $('[name=budget]', o)?.value
         const monthly_budget = bv === undefined || bv === '' ? undefined : Math.round(Number(bv))
         const icon = $('[name=icon]', o)?.value
@@ -597,14 +597,14 @@ function catSheet({ title, kind, c, parent, s }) {
 }
 // ---------- Groups CRUD sheet: inline error, stays open on API failure ----------
 const GROUP_TYPES = [['asset', 'Asset'], ['liability', 'Liability']] // hanya dua tipe
-const grpMsg = m => /FOREIGN KEY/i.test(m) ? 'Grup tidak bisa dihapus karena masih memiliki akun.' : /UNIQUE/i.test(m) ? 'Nama grup sudah dipakai.' : /CHECK/i.test(m) ? 'Tipe harus asset atau liability.' : /NOT NULL/i.test(m) ? 'Nama tidak boleh kosong' : m
+const grpMsg = m => /FOREIGN KEY/i.test(m) ? 'This group still has accounts and cannot be deleted.' : /UNIQUE/i.test(m) ? 'Group name already in use.' : /CHECK/i.test(m) ? 'Type must be asset or liability.' : /NOT NULL/i.test(m) ? 'Name is required' : m
 function groupSheet(g) {
   const o = $('#ov')
-  o.innerHTML = `<div class="sheet"><h3>${g ? 'Edit group' : 'Group baru'}</h3>
-    <label>Nama (mis. BANK, Paylater)<input name="name" value="${esc(g?.name ?? '')}" autocomplete="off" aria-describedby="gerr"></label>
-    <label>Tipe<select name="type">${GROUP_TYPES.map(([v, l]) => `<option value="${v}"${(g?.type ?? 'asset') === v ? ' selected' : ''}>${l}</option>`).join('')}</select></label>
+  o.innerHTML = `<div class="sheet"><h3>${g ? 'Edit group' : 'New group'}</h3>
+    <label>Name (e.g. BANK, Paylater)<input name="name" value="${esc(g?.name ?? '')}" autocomplete="off" aria-describedby="gerr"></label>
+    <label>Type<select name="type">${GROUP_TYPES.map(([v, l]) => `<option value="${v}"${(g?.type ?? 'asset') === v ? ' selected' : ''}>${l}</option>`).join('')}</select></label>
     <div class="err" id="gerr" role="alert"></div>
-    <div class="btns"><button data-r="x">Batal</button>${g ? '<button data-r="d" class="danger">Hapus</button>' : ''}<button data-r="s" class="pri">Simpan</button></div></div>`
+    <div class="btns"><button data-r="x">Cancel</button>${g ? '<button data-r="d" class="danger">Delete</button>' : ''}<button data-r="s" class="pri">Save</button></div></div>`
   o.hidden = false
   const err = m => { $('#gerr', o).textContent = m }
   o.onclick = async e => {
@@ -614,18 +614,18 @@ function groupSheet(g) {
     try {
       if (r === 'd') {
         // dialog konfirmasi bergaya v2 (sheet), bukan confirm() bawaan browser
-        o.innerHTML = `<div class="sheet"><h3>Hapus group?</h3>
-          <p>Hapus group "${esc(g.name)}"? Group yang masih memiliki akun tidak bisa dihapus.</p>
+        o.innerHTML = `<div class="sheet"><h3>Delete group?</h3>
+          <p>Delete group "${esc(g.name)}"? Groups that still have accounts cannot be deleted.</p>
           <div class="err" id="gerr" role="alert"></div>
-          <div class="btns"><button data-r="cx">Batal</button><button data-r="cd" class="danger">Hapus</button></div></div>`
+          <div class="btns"><button data-r="cx">Cancel</button><button data-r="cd" class="danger">Delete</button></div></div>`
         return
       } else if (r === 'cx') { return groupSheet(g)
       } else if (r === 'cd') {
         try { await api('DELETE', 'groups/' + g.id) } catch (x) { if (x.message !== 'auth') { groupSheet(g); err(grpMsg(x.message)) } return }
       } else if (r === 's') {
         const name = $('[name=name]', o).value.trim(), type = $('[name=type]', o).value
-        if (!name) return err('Nama tidak boleh kosong')
-        if (!GROUP_TYPES.some(([v]) => v === type)) return err('Tipe harus asset atau liability.')
+        if (!name) return err('Name is required')
+        if (!GROUP_TYPES.some(([v]) => v === type)) return err('Type must be asset or liability.')
         if (g) await api('PUT', 'groups/' + g.id, { name, type }); else await api('POST', 'groups', { name, type })
       } else return
       o.hidden = true
@@ -639,16 +639,16 @@ function groupSheet(g) {
 function recSheet(x) {
   const o = $('#ov')
   const opt = (opts, val) => opts.map(([v, l]) => `<option value="${esc(v)}"${String(v) === String(val) ? ' selected' : ''}>${esc(l)}</option>`).join('')
-  o.innerHTML = `<div class="sheet"><h3>${x ? 'Edit recurring' : 'Recurring baru'}</h3>
-    <label>Catatan (mis. Cicilan KPR)<input name="note" value="${esc(x?.note ?? '')}" autocomplete="off"></label>
+  o.innerHTML = `<div class="sheet"><h3>${x ? 'Edit recurring' : 'New recurring'}</h3>
+    <label>Note (e.g. Mortgage)<input name="note" value="${esc(x?.note ?? '')}" autocomplete="off"></label>
     <label>Jenis<select name="kind">${opt([['expense', 'Expense'], ['income', 'Income']], x?.kind ?? 'expense')}</select></label>
-    <label>Jumlah (Rp)<input name="amount" type="number" inputmode="numeric" value="${esc(x?.amount ?? '')}"></label>
-    <label>Akun<select name="account_id">${opt(S.accts.map(a => [a.id, a.name]), x?.account_id)}</select></label>
-    <label>Kategori<select name="category_id">${opt([['', '—'], ...S.cats.map(c => [c.id, catName(c.id)])], x?.category_id ?? '')}</select></label>
-    <label>Tanggal tiap bulan (1-31)<input name="day_of_month" type="number" inputmode="numeric" value="${esc(x?.day_of_month ?? 1)}"></label>
+    <label>Amount (Rp)<input name="amount" type="number" inputmode="numeric" value="${esc(x?.amount ?? '')}"></label>
+    <label>Account<select name="account_id">${opt(S.accts.map(a => [a.id, a.name]), x?.account_id)}</select></label>
+    <label>Category<select name="category_id">${opt([['', '—'], ...S.cats.map(c => [c.id, catName(c.id)])], x?.category_id ?? '')}</select></label>
+    <label>Day of month (1-31)<input name="day_of_month" type="number" inputmode="numeric" value="${esc(x?.day_of_month ?? 1)}"></label>
     <label>Status<select name="active">${opt([[1, 'Aktif'], [0, 'Nonaktif']], x ? (x.active ? 1 : 0) : 1)}</select></label>
     <div class="err" id="rerr" role="alert"></div>
-    <div class="btns"><button data-r="x">Batal</button>${x ? '<button data-r="d" class="danger">Hapus</button>' : ''}<button data-r="s" class="pri">Simpan</button></div></div>`
+    <div class="btns"><button data-r="x">Cancel</button>${x ? '<button data-r="d" class="danger">Delete</button>' : ''}<button data-r="s" class="pri">Save</button></div></div>`
   o.hidden = false
   const err = m => { $('#rerr', o).textContent = m }
   o.onclick = async e => {
@@ -657,14 +657,14 @@ function recSheet(x) {
     if (!r || r === 'x') { o.hidden = true; return }
     try {
       if (r === 'd') {
-        if (!confirm('Hapus recurring ini?\nTransaksi yang sudah dibuat sebelumnya tidak ikut dihapus.')) return
+        if (!confirm('Delete this recurring item?\nTransactions already created are kept.')) return
         await api('DELETE', 'recurring/' + x.id)
       } else if (r === 's') {
         const v = n => $(`[name=${n}]`, o).value
         const amount = Math.round(Number(v('amount'))), day = Math.round(Number(v('day_of_month')))
-        if (!(amount > 0)) return err('Jumlah harus lebih dari 0')
-        if (!v('account_id')) return err('Pilih akun')
-        if (!(day >= 1 && day <= 31)) return err('Tanggal harus 1-31')
+        if (!(amount > 0)) return err('Amount must be greater than 0')
+        if (!v('account_id')) return err('Select an account')
+        if (!(day >= 1 && day <= 31)) return err('Day must be 1-31')
         const p = { kind: v('kind'), amount, account_id: Number(v('account_id')), category_id: v('category_id') === '' ? null : Number(v('category_id')), note: v('note').trim(), day_of_month: day, active: Number(v('active')) }
         if (x) await api('PUT', 'recurring/' + x.id, p); else await api('POST', 'recurring', p)
       } else return
@@ -674,10 +674,10 @@ function recSheet(x) {
   }
   setTimeout(() => $('[name=note]', o)?.focus(), 0)
 }
-const confirmDel = r =>r?._del ? confirm('Hapus item ini?') : !!r
+const confirmDel = r =>r?._del ? confirm('Delete this item?') : !!r
 
 // ---------- transaksi baru (layar penuh, desain v2 isNew/isTransfer) ----------
-const NF_MSG = { amount: 'Nominal harus lebih dari 0.', dateEmpty: 'Tanggal wajib diisi.', dateInvalid: 'Tanggal tidak valid.', account: 'Akun wajib dipilih.', from: 'Akun asal wajib dipilih.', to: 'Akun tujuan wajib dipilih.', same: 'Akun tujuan tidak boleh sama dengan akun asal.', category: 'Kategori wajib dipilih.', failed: 'Transaksi gagal disimpan. Silakan coba lagi.' }
+const NF_MSG = { amount: 'Amount must be greater than 0.', dateEmpty: 'Date is required.', dateInvalid: 'Invalid date.', account: 'Account is required.', from: 'Source account is required.', to: 'Destination account is required.', same: 'Destination must differ from source account.', category: 'Category is required.', failed: 'Failed to save transaction. Please try again.' }
 const nfValidDate = s => { const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s); if (!m) return false; const d = new Date(Date.UTC(+m[1], +m[2] - 1, +m[3])); return d.getUTCFullYear() === +m[1] && d.getUTCMonth() === +m[2] - 1 && d.getUTCDate() === +m[3] }
 function nfValidate(f) {
   const e = {}
@@ -712,20 +712,20 @@ function txNew() {
     const segs = ['income', 'expense', 'transfer'].map(k => `<button data-nf="type" data-v="${k}" style="height:40px;border-radius:999px;font-size:14px;font-weight:600;background:${f.type === k ? '#fff' : 'transparent'};color:${f.type === k ? INK : MUTED};box-shadow:${f.type === k ? '0 1px 3px rgba(22,33,28,.12)' : 'none'}">${NF_TYPE_LABEL[k]}</button>`).join('')
     const catHtml = CategoryPicker.render({ cats: S.cats, type: f.type, cat: f.cat, sub: f.sub, error: errs.cat, icon: categoryIcon, esc })
     fm.innerHTML = `<div class="in-wrap">
-      <div style="display:flex;align-items:center;gap:12px;padding:24px 20px 8px"><button data-nf="cancel" aria-label="Kembali" style="width:44px;height:44px;border-radius:50%;border:1px solid ${LINE};background:#fff;display:flex;align-items:center;justify-content:center;color:${INK}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg></button><span style="font-size:20px;font-weight:700;letter-spacing:-.01em">Transaksi Baru</span></div>
+      <div style="display:flex;align-items:center;gap:12px;padding:24px 20px 8px"><button data-nf="cancel" aria-label="Back" style="width:44px;height:44px;border-radius:50%;border:1px solid ${LINE};background:#fff;display:flex;align-items:center;justify-content:center;color:${INK}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg></button><span style="font-size:20px;font-weight:700;letter-spacing:-.01em">New Transaction</span></div>
       <div style="margin:12px 20px 0;padding:4px;border-radius:999px;background:${LINE};display:grid;grid-template-columns:repeat(3,minmax(0,1fr))">${segs}</div>
       <div style="margin:16px 20px 0;padding:20px;border-radius:24px;background:#fff">
-        <div style="font-size:13px;color:${MUTED}">Nominal</div>
+        <div style="font-size:13px;color:${MUTED}">Amount</div>
         <div style="display:flex;align-items:baseline;gap:8px;margin-top:4px"><span style="font-size:22px;font-weight:600;color:#9aa39d">Rp</span><input name="amount" inputmode="numeric" placeholder="0" value="${f.amount ? fmt(f.amount) : ''}" style="flex:1;min-width:0;border:0;background:transparent;font-size:40px;font-weight:800;letter-spacing:-.02em;color:${INK};outline:none;padding:0"></div>${err('amount')}
         <div style="display:flex;align-items:center;gap:10px;margin-top:14px;padding-top:14px;border-top:1px solid ${LINE}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="${MUTED}" stroke-width="1.9" stroke-linecap="round"><path d="M8 2v4M16 2v4M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zM3 10h18"/></svg><input type="date" name="date" value="${esc(f.date)}" style="flex:1;border:0;background:transparent;font-size:14px;font-weight:500;color:${INK};outline:none;padding:0"></div>${err('date')}
       </div>
-      ${sec(tr ? 'Dari akun' : 'Akun', accts('account', S.accts) + err('account'))}
-      ${tr ? sec('Ke akun', accts('to', S.accts) + err('to')) : ''}
+      ${sec(tr ? 'From account' : 'Account', accts('account', S.accts) + err('account'))}
+      ${tr ? sec('To account', accts('to', S.accts) + err('to')) : ''}
       ${tr ? '' : catHtml}
       <div style="display:flex;flex-direction:column;gap:8px;padding:24px 20px 0">
         ${failed ? `<div role="alert" style="color:#c0392b;font-size:13px;text-align:center">${esc(NF_MSG.failed)}</div>` : ''}
-        <button data-nf="save" ${saving ? 'disabled' : ''} style="height:56px;border-radius:999px;background:${G};color:#fff;font-size:15px;font-weight:700">Simpan ${NF_TYPE_LABEL[f.type]}</button>
-        <button data-nf="cancel" style="height:48px;border-radius:999px;color:${MUTED};font-size:14px;font-weight:600">Batal</button>
+        <button data-nf="save" ${saving ? 'disabled' : ''} style="height:56px;border-radius:999px;background:${G};color:#fff;font-size:15px;font-weight:700">Save ${NF_TYPE_LABEL[f.type]}</button>
+        <button data-nf="cancel" style="height:48px;border-radius:999px;color:${MUTED};font-size:14px;font-weight:600">Cancel</button>
       </div></div>`
     fm.hidden = false
   }
@@ -782,16 +782,16 @@ function txForm(t) {
     return `Sisa budget ${esc(b.name)}: ${fmt(rem)} → <b class="${rem - (+f.amount || 0) < 0 ? 'ex' : ''}">${fmt(rem - (+f.amount || 0))}</b>`
   }
   const draw = () => {
-    fm.innerHTML = `<div class="in-wrap"><header style="display:flex;align-items:center;gap:8px"><button data-r="x" aria-label="Kembali" style="background:none;border:0;padding:4px 8px 4px 0;font-size:22px;line-height:1;color:inherit;cursor:pointer">←</button>${t ? 'Edit' : 'Transaksi baru'}</header>
+    fm.innerHTML = `<div class="in-wrap"><header style="display:flex;align-items:center;gap:8px"><button data-r="x" aria-label="Back" style="background:none;border:0;padding:4px 8px 4px 0;font-size:22px;line-height:1;color:inherit;cursor:pointer">←</button>${t ? 'Edit' : 'New transaction'}</header>
       <div class="seg">${['income', 'expense', 'transfer'].map(k => `<button data-k="${k}" class="${f.kind === k ? 'on' : ''}">${k[0].toUpperCase() + k.slice(1)}</button>`).join('')}</div>
-      <div class="f"><label>Tanggal</label><input type="date" name="date" value="${esc(f.date)}"></div>
-      <div class="f amt"><label>Jumlah</label><input name="amount" inputmode="numeric" placeholder="0" value="${f.amount ? fmt(f.amount) : ''}"></div>
-      ${f.kind === 'transfer' ? '' : `<div class="f"><label>Kategori</label><select name="category_id">${catOpts()}</select></div>`}
-      <div class="f"><label>${f.kind === 'transfer' ? 'Dari' : 'Account'}</label><select name="account_id">${accOpts(f.account_id)}</select></div>
-      ${f.kind === 'transfer' ? `<div class="f"><label>Ke</label><select name="to_account_id">${accOpts(f.to_account_id ?? S.accts.find(a => a.id !== f.account_id)?.id)}</select></div>` : ''}
-      <div class="f"><label>Catatan</label><input name="note" value="${esc(f.note)}"></div>
+      <div class="f"><label>Date</label><input type="date" name="date" value="${esc(f.date)}"></div>
+      <div class="f amt"><label>Amount</label><input name="amount" inputmode="numeric" placeholder="0" value="${f.amount ? fmt(f.amount) : ''}"></div>
+      ${f.kind === 'transfer' ? '' : `<div class="f"><label>Category</label><select name="category_id">${catOpts()}</select></div>`}
+      <div class="f"><label>${f.kind === 'transfer' ? 'From' : 'Account'}</label><select name="account_id">${accOpts(f.account_id)}</select></div>
+      ${f.kind === 'transfer' ? `<div class="f"><label>To</label><select name="to_account_id">${accOpts(f.to_account_id ?? S.accts.find(a => a.id !== f.account_id)?.id)}</select></div>` : ''}
+      <div class="f"><label>Note</label><input name="note" value="${esc(f.note)}"></div>
       <div class="hint" id="hint">${hint()}</div>
-      <div class="acts"><button data-r="x">Batal</button>${t ? '<button data-r="d" class="danger">Hapus</button>' : ''}<button data-r="s" class="pri">Simpan</button></div></div>`
+      <div class="acts"><button data-r="x">Cancel</button>${t ? '<button data-r="d" class="danger">Delete</button>' : ''}<button data-r="s" class="pri">Save</button></div></div>`
     fm.hidden = false
   }
   fm.oninput = fm.onchange = e => {
@@ -804,7 +804,7 @@ function txForm(t) {
     const b = e.target.closest('button'); if (!b) return
     if (b.dataset.k) { f.kind = b.dataset.k; if (f.kind !== 'transfer') f.to_account_id = null; else f.category_id = null; if (f.category_id && cat(f.category_id)?.kind !== (f.kind === 'income' ? 'income' : 'expense')) f.category_id = null; return draw() }
     if (b.dataset.r === 'x') return close()
-    if (b.dataset.r === 'd') { if (!confirm('Hapus transaksi ini?')) return; await api('DELETE', 'transactions/' + t.id); close(); return load() }
+    if (b.dataset.r === 'd') { if (!confirm('Delete this transaction?')) return; await api('DELETE', 'transactions/' + t.id); close(); return load() }
     if (b.dataset.r === 's') {
       const p = { date: f.date, kind: f.kind, amount: f.amount, account_id: f.account_id, to_account_id: f.kind === 'transfer' ? (f.to_account_id ?? fm.querySelector('[name=to_account_id]').value | 0) : null, category_id: f.kind === 'transfer' ? null : f.category_id, note: f.note ?? '' }
       if (t) { await api('PUT', 'transactions/' + t.id, { ...p, flag: null }) } else await api('POST', 'transactions', p)
@@ -826,8 +826,8 @@ const A = {
   sub: d => { S.sub = d.v; history.pushState({ sub: d.v }, ''); render(); if (d.v === 'groups') refreshGroups(); if (d.v === 'recurring') refreshRecurring() },
   back: () => { if (history.state?.sub) history.back(); else { S.sub = null; render() } },
   logout: async () => { document.cookie = 'midas=; Max-Age=0; Path=/'; showLogin() },
-  catAdd: d => catSheet({ title: 'Kategori baru', kind: d.kind }),
-  catEdit: d => catSheet({ title: 'Edit kategori', c: cat(+d.id) }),
+  catAdd: d => catSheet({ title: 'New category', kind: d.kind }),
+  catEdit: d => catSheet({ title: 'Edit category', c: cat(+d.id) }),
   grpAdd: () => groupSheet(null),
   grpEdit: d => groupSheet(S.groups.find(x => x.id === +d.id)),
   accAdd: async () => A._acc(null),
@@ -836,7 +836,7 @@ const A = {
   accEditD: d => A._acc(S.accts.find(a => a.id === +d.id)),
   accEdit: d => A._acc(S.accts.find(a => a.id === +d.id)),
   _acc: async a => {
-    const r = await ask(a ? 'Edit account' : 'Account baru', [{ k: 'name', label: 'Nama', value: a?.name }, { k: 'group_id', label: 'Group', num: true, value: a?.group_id, options: S.groups.map(g => [g.id, `${g.name} (${g.type})`]) }, { k: 'opening_balance', label: 'Saldo awal (Rp, minus untuk utang)', type: 'number', value: a?.opening_balance ?? 0 }], !!a)
+    const r = await ask(a ? 'Edit account' : 'New account', [{ k: 'name', label: 'Name', value: a?.name }, { k: 'group_id', label: 'Group', num: true, value: a?.group_id, options: S.groups.map(g => [g.id, `${g.name} (${g.type})`]) }, { k: 'opening_balance', label: 'Opening balance (Rp, negative for debt)', type: 'number', value: a?.opening_balance ?? 0 }], !!a)
     if (!confirmDel(r)) return
     if (r._del) return (await api('DELETE', 'accounts/' + a.id), load())
     if (!r.name) return

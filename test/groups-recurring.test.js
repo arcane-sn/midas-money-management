@@ -45,7 +45,7 @@ test('groups: hapus grup berakun ditolak dengan pesan error, grup tetap ada', as
   const del = await s.call('DELETE', `/api/groups/${g}`)
   assert.equal(del.status, 400); assert.match(del.json.error, /FOREIGN KEY/i)
   assert.ok((await s.call('GET', '/api/groups')).json.some(x => x.id === g))
-  assert.match(html, /FOREIGN KEY[^\n]*masih memiliki akun/) // UI memetakan error ke pesan ramah
+  assert.match(html, /FOREIGN KEY[^\n]*still has accounts/) // UI memetakan error ke pesan ramah
   s.close()
 })
 test('groups: hapus grup kosong berhasil', async () => {
@@ -55,7 +55,7 @@ test('groups: hapus grup kosong berhasil', async () => {
   s.close()
 })
 test('groups: UI punya state kosong, error+retry, dan aksi tambah/ubah', () => {
-  assert.match(html, /Belum ada grup\./); assert.match(html, /Gagal memuat grup/)
+  assert.match(html, /No groups yet\./); assert.match(html, /Failed to load groups/)
   assert.match(html, /data-a="groupsRetry"/); assert.match(html, /grpAdd/); assert.match(html, /grpEdit/)
 })
 
@@ -98,8 +98,8 @@ test('recurring: hapus recurring tidak menghapus transaksi yang sudah dibuat', a
   s.close()
 })
 test('recurring: UI punya state kosong, error+retry, dan konfirmasi hapus', () => {
-  assert.match(html, /Belum ada transaksi berulang/); assert.match(html, /Gagal memuat recurring/)
-  assert.match(html, /data-a="recRetry"/); assert.match(html, /Transaksi yang sudah dibuat sebelumnya tidak ikut dihapus/)
+  assert.match(html, /No recurring transactions yet/); assert.match(html, /Failed to load recurring/)
+  assert.match(html, /data-a="recRetry"/); assert.match(html, /Transactions already created are kept/)
 })
 
 // ---------- runDue (DoD 7) ----------
