@@ -307,7 +307,7 @@ const brandHtml = () => {
   return `<span class="brand${on ? ' intro' : ''}" style="--e:${on ? Math.round(e) : 0}ms" aria-label="MIDAS"><svg viewBox="0 0 32 32" aria-hidden="true"><rect class="sq" width="32" height="32" rx="9" fill="#1e5a43"/><g class="coin"><circle cx="16" cy="16" r="10" fill="#f5b301"/><circle cx="16" cy="16" r="7.6" fill="none" stroke="#c98a0b" stroke-width="1"/><path d="M11.2 21V11l4.8 6 4.8-6v10" fill="none" stroke="#1e5a43" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></g></svg><span class="word" aria-hidden="true">${letters}</span></span>`
 }
 function render() {
-  const titles = { trans: brandHtml(), stats, stats: 'Stats', accts: '', more: 'Settings' }
+  const titles = { trans: brandHtml(), stats: 'Stats', accts: '', more: 'Settings' }
   const body = S.status !== 'ready' ? vState() : ({ trans: vTrans, stats: vStats, accts: vAccts, more: vMore }[S.tab] || vPlaceholder)()
   document.querySelectorAll('#bottom-nav .bn-tab').forEach(b => b.classList.toggle('active', TAB_MAP[b.dataset.tab] === S.tab))
   $('#app').innerHTML = `<header>${titles[S.tab] ?? ''}</header><main>${body}</main>`
