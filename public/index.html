@@ -237,12 +237,12 @@ const monthLong = m => new Date(m + '-01T00:00:00').toLocaleDateString('id-ID', 
 function spentCard(pending) {
   const inc = sumOf('income'), exp = sumOf('expense'), net = inc - exp
   const canNext = S.month < today().slice(0, 7)
-  return `<div class="scard"><div class="top"><span class="ttl">Spent in ${esc(monthLong(S.month))}</span><div class="pn">` +
+  return `<div class="scard"><div class="top"><span class="ttl">Net in ${esc(monthLong(S.month))}</span><div class="pn">` +
     `<button data-a="mon" data-v="-1" aria-label="Bulan lalu"><svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></button>` +
     `<span>${esc(monthLabel(S.month))}</span>` +
     `<button data-a="mon" data-v="1" aria-label="Bulan depan"${canNext ? '' : ' disabled'}><svg viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></button></div></div>` +
-    `<div class="big num"><small>Rp</small>${pending ? '—' : fmt(exp)}</div>` +
-    `<div class="two"><div><span>Income</span><b class="num">${pending ? '—' : fmt(inc)}</b></div><div><span>Net</span><b class="num">${pending ? '—' : (net < 0 ? '−' : '') + fmt(Math.abs(net))}</b></div></div></div>`
+    `<div class="big num"><small>Rp</small>${pending ? '—' : (net < 0 ? '−' : '') + fmt(Math.abs(net))}</div>` +
+    `<div class="two"><div><span>Income</span><b class="num">${pending ? '—' : fmt(inc)}</b></div><div><span>Expense</span><b class="num">${pending ? '—' : fmt(exp)}</b></div></div></div>`
 }
 
 function vTrans() {
