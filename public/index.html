@@ -76,6 +76,58 @@ nav button.on{color:var(--red)}nav button i{display:block;font-style:normal;font
 .seg{display:flex;gap:8px;padding:8px 14px}
 .seg button{flex:1;border:1px solid var(--line2);border-radius:7px;padding:8px 0;color:var(--mut)}
 .seg button.on{border-color:var(--red);color:var(--red)}
+.st{padding:4px 20px 24px}
+.st-pill{display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:4px;background:var(--sec);border-radius:14px}
+.st-pill button{padding:9px 0;border-radius:11px;font-weight:600;font-size:13px;color:var(--mut);transition:background .2s,color .2s,box-shadow .2s}
+.st-pill button.on{background:#fff;color:var(--color-primary);box-shadow:0 1px 4px #0001}
+.st .mnav{display:flex;align-items:center;justify-content:space-between;margin:14px 0 4px;padding:0}
+.st .mnav b{font-size:15px;font-weight:700}
+.st .mnav button{width:34px;height:34px;border-radius:50%;background:#fff;font-size:18px;color:var(--txt);box-shadow:0 1px 3px #0001}
+.st .mnav button:disabled{opacity:.35}
+.st-card{background:#fff;border-radius:24px;padding:20px;margin-top:12px}
+.st-hero{display:flex;align-items:center;gap:18px}
+.st-donut{position:relative;width:132px;height:132px;flex:none}
+.st-donut svg{width:100%;height:100%;transform:rotate(-90deg)}
+.st-donut circle{fill:none;stroke-width:15}
+.st-donut .trk{stroke:var(--sec)}
+.st-donut .ctr{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:11px;color:var(--mut)}
+.st-donut .ctr b{font-size:15px;color:var(--txt);margin-top:2px}
+.st-meta{min-width:0}
+.st-meta small{font-size:12px;color:var(--mut)}
+.st-meta .tot{font-size:24px;font-weight:800;letter-spacing:-.02em;margin:2px 0 8px;white-space:nowrap}
+.st-meta .tot small{font-size:13px;font-weight:600;color:var(--mut);margin-right:3px}
+.st-chip{display:inline-block;padding:4px 10px;border-radius:99px;font-size:11px;font-weight:600;background:var(--sec);color:var(--txt2)}
+.st-row{display:grid;grid-template-columns:40px minmax(0,1fr) auto;gap:12px;align-items:center;padding:12px 0;border-top:1px solid var(--line)}
+.st-row:first-child{border-top:0}
+.st-row .ic{width:40px;height:40px;border-radius:14px;display:grid;place-items:center}
+.st-row .nm{font-size:14px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.st-row .bar{height:5px;margin-top:7px;background:var(--sec)}
+.st-row .bar i{background:currentColor}
+.st-row .am{text-align:right}
+.st-row .am b{display:block;font-size:14px;font-weight:700;white-space:nowrap}
+.st-row .am small{font-size:11px;color:var(--mut)}
+.ac{padding:0 20px 24px}
+.ac-top{display:flex;align-items:center;justify-content:space-between;padding:20px 0 4px}
+.ac-top h1{margin:0;font-size:26px;font-weight:800;letter-spacing:-.02em}
+.ac-top button{display:flex;align-items:center;gap:6px;height:38px;padding:0 14px;border-radius:99px;background:var(--color-primary);color:#fff;font-size:13px;font-weight:600}
+.ac-top svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2.6;stroke-linecap:round}
+.ac-hero{margin-top:12px;padding:20px;border-radius:24px;background:var(--color-primary);color:#fff;position:relative;overflow:hidden}
+.ac-hero::after{content:'';position:absolute;right:-40px;top:-50px;width:160px;height:160px;border-radius:50%;background:#ffffff14}
+.ac-hero>small{font-size:12px;opacity:.8}
+.ac-hero .nw{font-size:30px;font-weight:800;letter-spacing:-.02em;margin:2px 0 14px;position:relative}
+.ac-hero .nw small{font-size:15px;font-weight:600;opacity:.8;margin-right:4px}
+.ac-hero .two{display:grid;grid-template-columns:1fr 1fr;gap:8px;position:relative}
+.ac-hero .two div{padding:10px 12px;border-radius:16px;font-size:11px}
+.ac-hero .two .a{background:#4ade8026}.ac-hero .two .l{background:#f8717126}
+.ac-hero .two span{opacity:.85}.ac-hero .two b{display:block;font-size:15px;margin-top:2px}
+.ac-gh{display:flex;justify-content:space-between;align-items:baseline;padding:20px 4px 8px;font-size:12px;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.05em}
+.ac-gh.liab{color:var(--red)}
+.ac-card{background:#fff;border-radius:20px;padding:4px 16px}
+.ac-row{display:grid;grid-template-columns:40px minmax(0,1fr) auto;gap:12px;align-items:center;padding:13px 0;border-top:1px solid var(--line);width:100%;text-align:left;cursor:pointer}
+.ac-row:first-child{border-top:0}
+.ac-av{width:40px;height:40px;border-radius:14px;display:grid;place-items:center;font-size:13px;font-weight:800}
+.ac-nm{font-size:14px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ac-bal{font-size:14px;font-weight:700;white-space:nowrap}
 .tabs{display:flex;border-bottom:1px solid var(--line)}
 .tabs button{flex:1;padding:10px 0;color:var(--mut)}.tabs button.on{color:var(--txt);border-bottom:2px solid var(--red)}
 .accts-v2{padding:0 20px;max-width:100%;overflow-x:hidden}
@@ -169,7 +221,7 @@ const $ =(s, r = document) => r.querySelector(s)
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]))
 const fmt = n => new Intl.NumberFormat('id-ID').format(n)
 const today = () => new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Jakarta' }).format(new Date())
-const S = { month: today().slice(0, 7), tab: 'trans', sub: null, sKind: 'expense', sTab: 'stats', cats: [], groups: [], accts: [], txs: [], rec: [], sum: null }
+const S = { month: today().slice(0, 7), tab: 'trans', sub: null, sKind: 'expense', stKind: 'expense', sTab: 'stats', cats: [], groups: [], accts: [], txs: [], rec: [], sum: null }
 
 async function api(method, path, body) {
   const r = await fetch('/api/' + path, { method, headers: body ? { 'content-type': 'application/json' } : {}, body: body ? JSON.stringify(body) : undefined })
@@ -220,7 +272,7 @@ const monthLabel = m => new Date(m + '-01T00:00:00').toLocaleDateString('id-ID',
 const sign = { income: 'in', expense: 'ex', transfer: '' }
 
 function render() {
-  const titles = { trans: `<span class="brand"><svg viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="9" fill="#1e5a43"/><circle cx="16" cy="16" r="10" fill="#f5b301"/><circle cx="16" cy="16" r="7.6" fill="none" stroke="#c98a0b" stroke-width="1"/><text x="16" y="16.6" font-size="12" font-family="Plus Jakarta Sans,sans-serif" font-weight="800" text-anchor="middle" dominant-baseline="central" fill="#1e5a43">M</text></svg>MIDAS</span>`, stats: 'Stats', accts: 'Accounts', more: 'Settings' }
+  const titles = { trans: `<span class="brand"><svg viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="9" fill="#1e5a43"/><circle cx="16" cy="16" r="10" fill="#f5b301"/><circle cx="16" cy="16" r="7.6" fill="none" stroke="#c98a0b" stroke-width="1"/><text x="16" y="16.6" font-size="12" font-family="Plus Jakarta Sans,sans-serif" font-weight="800" text-anchor="middle" dominant-baseline="central" fill="#1e5a43">M</text></svg>MIDAS</span>`, stats: 'Stats', accts: '', more: 'Settings' }
   const body = S.status !== 'ready' ? vState() : ({ trans: vTrans, stats: vStats, accts: vAccts, more: vMore }[S.tab] || vPlaceholder)()
   document.querySelectorAll('#bottom-nav .bn-tab').forEach(b => b.classList.toggle('active', TAB_MAP[b.dataset.tab] === S.tab))
   $('#app').innerHTML = `<header>${titles[S.tab] ?? ''}</header><main>${body}</main>`
@@ -277,27 +329,36 @@ function vTrans() {
   return html
 }
 
+const ST_COLORS = ['#1e5a43', '#f5b301', '#3b82f6', '#e11d48', '#8b5cf6', '#14b8a6', '#f97316', '#64748b']
 function vStats() {
-  let html = `<div class="seg"><button data-a="sTab" data-v="stats" class="${S.sTab === 'stats' ? 'on' : ''}">Stats</button><button data-a="sTab" data-v="budget" class="${S.sTab === 'budget' ? 'on' : ''}">Budget</button></div>` + monthBar()
+  const pill = (a, v, l) => `<button data-a="${a}" data-v="${v}" class="${(a === 'sTab' ? S.sTab : S.stKind) === v ? 'on' : ''}">${l}</button>`
+  const head = `<div class="st"><div class="st-pill">${pill('sTab', 'stats', 'Stats')}${pill('sTab', 'budget', 'Budget')}</div>` + monthBar()
   // Budget: placeholder saja (isi dikerjakan di tiket terpisah); S.month dibagikan antar tab
-  if (S.sTab === 'budget') return html + '<div class="empty">Budget segera hadir</div>'
-  return html + vStatsBody()
+  if (S.sTab === 'budget') return head + '<div class="empty">Budget segera hadir</div></div>'
+  return head + vStatsBody() + '</div>'
 }
 
-// Slot isi tab Stats (diisi/diganti oleh tugas berikutnya)
 function vStatsBody() {
-  const section = (kind, title) => {
-    const by = new Map(); let total = 0
-    for (const t of S.txs.filter(t => t.kind === kind)) { const k = family(t.category_id); by.set(k, (by.get(k) ?? 0) + t.amount); total += t.amount }
-    if (!by.size) return null
-    const rows = [...by].map(([k, v]) => [cat(k)?.name ?? 'Tanpa kategori', v]).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
-    return `<div class="sec"><span>${title}</span><span class="num">${fmt(total)}</span></div>` + rows.map(([name, v]) =>
-      `<div class="bud"><div><span>${esc(name)}</span><span class="num">${fmt(v)} · ${total > 0 ? Math.round(v / total * 100) : 0}%</span></div><div class="bar"><i class="${kind === 'expense' ? 'd' : ''}" style="width:${total > 0 ? v / total * 100 : 0}%"></i></div></div>`).join('')
-  }
-  const parts = [section('expense', 'Pengeluaran'), section('income', 'Pemasukan')].filter(Boolean)
-  // noStats: tidak ada pengeluaran maupun pemasukan di bulan terpilih
-  if (!parts.length) return '<div class="empty">Nothing recorded this month.</div>'
-  return parts.join('')
+  const kind = S.stKind
+  const by = new Map(); let total = 0
+  for (const t of S.txs.filter(t => t.kind === kind)) { const k = family(t.category_id); by.set(k, (by.get(k) ?? 0) + t.amount); total += t.amount }
+  const toggle = `<div class="st-pill" style="margin-top:8px"><button data-a="stKind" data-v="expense" class="${kind === 'expense' ? 'on' : ''}">Pengeluaran</button><button data-a="stKind" data-v="income" class="${kind === 'income' ? 'on' : ''}">Pemasukan</button></div>`
+  if (!by.size) return toggle + `<div class="st-card empty" style="padding:40px 20px">Belum ada ${kind === 'expense' ? 'pengeluaran' : 'pemasukan'} bulan ini.</div>`
+  const rows = [...by].map(([k, v]) => [cat(k)?.name ?? 'Tanpa kategori', v]).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+  const R = 54, C = 2 * Math.PI * R; let off = 0
+  const arcs = rows.map(([, v], i) => {
+    const len = v / total * C
+    const a = `<circle cx="66" cy="66" r="${R}" stroke="${ST_COLORS[i % ST_COLORS.length]}" stroke-dasharray="${Math.max(len - 2, 0.5)} ${C}" stroke-dashoffset="${-off}" stroke-linecap="round"/>`
+    off += len; return a
+  }).join('')
+  const days = new Date(+S.month.slice(0, 4), +S.month.slice(5), 0).getDate()
+  const hero = `<div class="st-card"><div class="st-hero"><div class="st-donut"><svg viewBox="0 0 132 132"><circle class="trk" cx="66" cy="66" r="${R}"/>${arcs}</svg><div class="ctr"><span>${rows.length} kategori</span><b>${Math.round(rows[0][1] / total * 100)}%</b></div></div>` +
+    `<div class="st-meta"><small>Total ${kind === 'expense' ? 'pengeluaran' : 'pemasukan'}</small><div class="tot num"><small>Rp</small>${fmt(total)}</div><span class="st-chip">≈ ${fmt(Math.round(total / days))} / hari</span></div></div></div>`
+  const list = `<div class="st-card" style="padding:8px 20px">` + rows.map(([name, v], i) => {
+    const col = ST_COLORS[i % ST_COLORS.length], pc = v / total * 100
+    return `<div class="st-row" style="color:${col}"><div class="ic" style="background:${col}1f" aria-hidden="true">${categoryIcon(name)}</div><div style="min-width:0"><div class="nm" style="color:var(--txt)">${esc(name)}</div><div class="bar"><i style="width:${pc}%"></i></div></div><div class="am"><b style="color:var(--txt)" class="num">${fmt(v)}</b><small>${Math.round(pc)}%</small></div></div>`
+  }).join('') + '</div>'
+  return toggle + hero + list
 }
 
 function vAcctDetail() {
@@ -331,15 +392,17 @@ function vAccts() {
   else if (!S.accts.length) list = '<div class="empty">Belum ada akun.</div>'
   else {
     const t = S.sum?.totals
-    list = t ? `<div class="sum" style="margin-top:8px"><div>Assets<b class="num in">${fmt(t.assets)}</b></div><div>Liabilities<b class="num ex">${fmt(t.liabilities)}</b></div><div>Net Worth<b class="num ${t.total < 0 ? 'ex' : ''}">${fmt(t.total)}</b></div></div>` : ''
+    const rp = n => (n < 0 ? '−' : '') + 'Rp ' + fmt(Math.abs(Math.round(n)))
+    const AV = ['#1e5a43', '#3b82f6', '#8b5cf6', '#f97316', '#14b8a6', '#e11d48', '#c98a0b']
+    list = t ? `<div class="ac-hero"><small>Net Worth</small><div class="nw num"><small>${t.total < 0 ? '−' : ''}Rp</small>${fmt(Math.abs(Math.round(t.total)))}</div><div class="two"><div class="a"><span>Assets</span><b class="num">${fmt(Math.round(t.assets))}</b></div><div class="l"><span>Liabilities</span><b class="num">${fmt(Math.round(t.liabilities))}</b></div></div></div>` : ''
     for (const g of [...S.groups, { id: null, name: 'Lainnya', type: 'asset' }].sort((a, b) => (b.type === 'liability') - (a.type === 'liability'))) {
       const items = S.accts.filter(a => (a.group_id ?? null) === g.id); if (!items.length) continue
-      const gs = items.reduce((n, a) => n + a.balance, 0)
-      list += `<div class="grp2${g.type === 'liability' ? ' liab' : ''}"><span>${esc(g.name)}${g.type === 'liability' ? ' · Liability' : ''}</span><b class="num ${gs < 0 ? 'ex' : ''}">${fmtRupiah(gs)}</b></div>` +
-        items.map(a => `<div class="acct-item${g.type === 'liability' ? ' liab' : ''}" role="button" tabindex="0" data-a="acctOpen" data-id="${a.id}"><span class="acct-name">${esc(a.name)}</span><b class="num acct-bal ${a.balance < 0 ? 'ex' : ''}">${fmtRupiah(a.balance)}</b></div>`).join('')
+      const liab = g.type === 'liability', gs = items.reduce((n, a) => n + a.balance, 0)
+      list += `<div class="ac-gh${liab ? ' liab' : ''}"><span>${esc(g.name)}${liab ? ' · Liability' : ''}</span><b class="num">${rp(gs)}</b></div><div class="ac-card">` +
+        items.map((a, i) => { const col = liab ? '#c0392b' : AV[(a.id ?? i) % AV.length]; return `<div class="ac-row" role="button" tabindex="0" data-a="acctOpen" data-id="${a.id}"><div class="ac-av" style="background:${col}1f;color:${col}">${esc(a.name.slice(0, 2).toUpperCase())}</div><span class="ac-nm">${esc(a.name)}</span><b class="num ac-bal ${a.balance < 0 ? 'ex' : ''}">${rp(a.balance)}</b></div>` }).join('') + '</div>'
     }
   }
-  return `<section class="accts-v2" aria-label="Accounts"><h1 class="accts-title">Accounts</h1><div class="accts-list" id="accts-list">${list}</div><button class="fab" data-a="accAdd" aria-label="Tambah akun">+</button></section>`
+  return `<section class="ac" aria-label="Accounts"><div class="ac-top"><h1>Accounts</h1><button data-a="accAdd" aria-label="Tambah akun"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Akun</button></div><div id="accts-list">${list}</div></section>`
 }
 
 // Ambil ulang data akun dari GET /api/summary setiap layar Accounts dibuka (tanpa cache)
@@ -738,7 +801,7 @@ const A = {
   mon: d => { if (+d.v > 0 && !canGoNext(S.month, today().slice(0, 7))) return; S.month = shiftMonth(S.month, +d.v); load() },
   add: () => { S.previousTab = S.tab; $('#bottom-nav').classList.add('hidden'); txNew() },
   edit: d => txForm(S.txs.find(t => t.id === +d.id) ?? S.acctTxs?.find(t => t.id === +d.id)),
-  sTab: d => { S.sTab = d.v; render() }, sKind: d => { S.sKind = d.v; render() },
+  sTab: d => { S.sTab = d.v; render() }, sKind: d => { S.sKind = d.v; render() }, stKind: d => { S.stKind = d.v; render() },
   sub: d => { S.sub = d.v; history.pushState({ sub: d.v }, ''); render(); if (d.v === 'groups') refreshGroups(); if (d.v === 'recurring') refreshRecurring() },
   back: () => { if (history.state?.sub) history.back(); else { S.sub = null; render() } },
   logout: async () => { document.cookie = 'midas=; Max-Age=0; Path=/'; showLogin() },
