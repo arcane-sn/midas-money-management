@@ -141,7 +141,7 @@ nav button.on{color:var(--red)}nav button i{display:block;font-style:normal;font
 .ac-card{background:#fff;border-radius:20px;padding:4px 16px}
 .ac-row{display:grid;grid-template-columns:40px minmax(0,1fr) auto;gap:12px;align-items:center;padding:13px 0;border-top:1px solid var(--line);width:100%;text-align:left;cursor:pointer}
 .ac-row:first-child{border-top:0}
-.ac-av{width:40px;height:40px;border-radius:14px;display:grid;place-items:center;font-size:13px;font-weight:800}
+.ac-av{position:relative;width:40px;height:40px;border-radius:14px;display:grid;place-items:center;font-size:13px;font-weight:800}
 .ac-nm{font-size:14px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .ac-bal{font-size:14px;font-weight:700;white-space:nowrap}
 .set{padding:8px 20px 24px}
@@ -295,6 +295,7 @@ function vState() {
 }
 
 const cat = id => S.cats.find(c => c.id === id)
+const ico = n => categoryIcon(n, S.cats.find(c => c.name === n)?.icon)
 const catName = id => { const c = cat(id); if (!c) return '—'; const p = cat(c.parent_id); return p ? `${p.name} › ${c.name}` : c.name }
 const acc = id => S.accts.find(a => a.id === id)?.name ?? '?'
 const family = id => { const c = cat(id); return c ? (c.parent_id ?? c.id) : null }
@@ -354,7 +355,7 @@ function vTrans() {
     const sub = t.kind === 'transfer' || !parent ? '' : c.name
     const acct = t.kind === 'transfer' ? `${esc(acc(t.account_id))} → ${esc(acc(t.to_account_id))}` : esc(acc(t.account_id))
     const mark = t.flag === 'review' ? '<span class="badge r">Review</span>' : t.source === 'auto' ? '<span class="badge">Auto</span>' : ''
-    html += `<div class="row"><div class="ico" aria-hidden="true">${categoryIcon(top)}</div><div class="n"><span>${esc(sub || top)}</span><small>${sub ? `<i>${esc(top)}</i>` : ''}${mark}</small></div><div class="amt"><b class="${sign[t.kind]}">${fmt(t.amount)}</b><small>${acct}</small></div></div>`
+    html += `<div class="row"><div class="ico" aria-hidden="true">${ico(top)}</div><div class="n"><span>${esc(sub || top)}</span><small>${sub ? `<i>${esc(top)}</i>` : ''}${mark}</small></div><div class="amt"><b class="${sign[t.kind]}">${fmt(t.amount)}</b><small>${acct}</small></div></div>`
   }
   if (open) html += '</div></div>'
   return html
@@ -387,7 +388,7 @@ function vStatsBody() {
     `<div class="st-meta"><small>Total ${kind === 'expense' ? 'expenses' : 'income'}</small><div class="tot num"><small>Rp</small>${fmt(total)}</div><span class="st-chip">≈ ${fmt(Math.round(total / days))} / day</span></div></div></div>`
   const list = `<div class="st-card" style="padding:8px 20px">` + rows.map(([name, v], i) => {
     const col = ST_COLORS[i % ST_COLORS.length], pc = v / total * 100
-    return `<div class="st-row" style="color:${col}"><div class="ic" style="background:${col}1f" aria-hidden="true">${categoryIcon(name)}</div><div style="min-width:0"><div class="nm" style="color:var(--txt)">${esc(name)}</div><div class="bar"><i style="width:${pc}%"></i></div></div><div class="am"><b style="color:var(--txt)" class="num">${fmt(v)}</b><small>${Math.round(pc)}%</small></div></div>`
+    return `<div class="st-row" style="color:${col}"><div class="ic" style="background:${col}1f" aria-hidden="true">${ico(name)}</div><div style="min-width:0"><div class="nm" style="color:var(--txt)">${esc(name)}</div><div class="bar"><i style="width:${pc}%"></i></div></div><div class="am"><b style="color:var(--txt)" class="num">${fmt(v)}</b><small>${Math.round(pc)}%</small></div></div>`
   }).join('') + '</div>'
   return toggle + hero + list
 }
@@ -405,7 +406,7 @@ function vAcctDetail() {
       const sub = t.kind === 'transfer' || !parent ? '' : c.name
       const out = t.kind === 'expense' || (t.kind === 'transfer' && t.account_id === a.id)
       const other = t.kind === 'transfer' ? (t.account_id === a.id ? '→ ' + acc(t.to_account_id) : '← ' + acc(t.account_id)) : ''
-      return `<div class="row" role="button" tabindex="0" data-a="edit" data-id="${t.id}"><div class="ico" aria-hidden="true">${categoryIcon(top)}</div><div class="n"><span>${esc(sub || top)}</span><small>${esc(other || t.note || '')}</small></div><div class="amt"><b class="${out ? 'ex' : 'in'}">${out ? '−' : '+'}${fmt(t.amount)}</b><small>${esc(t.date)}</small></div></div>`
+      return `<div class="row" role="button" tabindex="0" data-a="edit" data-id="${t.id}"><div class="ico" aria-hidden="true">${ico(top)}</div><div class="n"><span>${esc(sub || top)}</span><small>${esc(other || t.note || '')}</small></div><div class="amt"><b class="${out ? 'ex' : 'in'}">${out ? '−' : '+'}${fmt(t.amount)}</b><small>${esc(t.date)}</small></div></div>`
     }).join('') + '</div>'
   }
   return `<section class="accts-v2" aria-label="${esc(a.name)}"><div class="v2-head"><button class="back" data-a="acctBack" aria-label="Back"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"></path><path d="M19 12H5"></path></svg></button><h1 class="ttl">${esc(a.name)}</h1><button class="add" data-a="accEditD" data-id="${a.id}">Edit</button></div><div class="acct-item${liab ? ' liab' : ''}" style="margin-top:4px"><span class="acct-name">Saldo</span><b class="num acct-bal ${a.balance < 0 ? 'ex' : ''}">${fmtRupiah(a.balance)}</b></div>${list}</section>`
@@ -424,13 +425,15 @@ function vAccts() {
   else {
     const t = S.sum?.totals
     const rp = n => (n < 0 ? '−' : '') + 'Rp ' + fmt(Math.abs(Math.round(n)))
+    const BRAND = { bca: '#0060af', gopay: '#00aed6', ovo: '#4c2a86', dana: '#118eea', shopeepay: '#ee4d2d', jago: '#f7a600', bsi: '#00a39d', mandiri: '#003d79', bri: '#00529c', bni: '#f15a22', jenius: '#00a7e1', linkaja: '#e82529' }
+    const brand = n => BRAND[Object.keys(BRAND).find(k => n.toLowerCase().replace(/\s/g, '').includes(k))]
     const AV = ['#1e5a43', '#3b82f6', '#8b5cf6', '#f97316', '#14b8a6', '#e11d48', '#c98a0b']
     list = t ? `<div class="ac-hero"><small>Net Worth</small><div class="nw num"><small>${t.total < 0 ? '−' : ''}Rp</small>${fmt(Math.abs(Math.round(t.total)))}</div><div class="two"><div class="a"><span class="lbl"><i><svg viewBox="0 0 24 24"><path d="M12 19V5M5 12l7-7 7 7"/></svg></i><em>Assets</em></span><b class="num">${fmt(Math.round(t.assets))}</b></div><div class="l"><span class="lbl"><i><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12l7 7 7-7"/></svg></i><em>Liabilities</em></span><b class="num">${fmt(Math.round(t.liabilities))}</b></div></div></div>` : ''
     for (const g of [...S.groups, { id: null, name: 'Other', type: 'asset' }].sort((a, b) => (b.type === 'liability') - (a.type === 'liability'))) {
       const items = S.accts.filter(a => (a.group_id ?? null) === g.id); if (!items.length) continue
       const liab = g.type === 'liability', gs = items.reduce((n, a) => n + a.balance, 0)
       list += `<div class="ac-gh${liab ? ' liab' : ''}"><span>${esc(g.name)}${liab ? ' · Liability' : ''}</span><b class="num">${rp(gs)}</b></div><div class="ac-card">` +
-        items.map((a, i) => { const col = liab ? '#c0392b' : AV[(a.id ?? i) % AV.length]; return `<div class="ac-row" role="button" tabindex="0" data-a="acctOpen" data-id="${a.id}"><div class="ac-av" style="background:${col}1f;color:${col}">${esc(a.name.slice(0, 2).toUpperCase())}</div><span class="ac-nm">${esc(a.name)}</span><b class="num ac-bal ${a.balance < 0 ? 'ex' : ''}">${rp(a.balance)}</b></div>` }).join('') + '</div>'
+        items.map((a, i) => { const col = liab ? '#c0392b' : brand(a.name) || AV[(a.id ?? i) % AV.length]; const slug = a.name.toLowerCase().replace(/[^a-z0-9]/g, ''); return `<div class="ac-row" role="button" tabindex="0" data-a="acctOpen" data-id="${a.id}"><div class="ac-av" style="background:${col}1f;color:${col};overflow:hidden">${esc(a.name.slice(0, 2).toUpperCase())}<img src="logos/${slug}.svg" alt="" style="position:absolute;width:40px;height:40px;object-fit:contain;background:#fff" onerror="this.remove()"></div><span class="ac-nm">${esc(a.name)}</span><b class="num ac-bal ${a.balance < 0 ? 'ex' : ''}">${rp(a.balance)}</b></div>` }).join('') + '</div>'
     }
   }
   return `<section class="ac" aria-label="Accounts"><div class="ac-top"><h1>Accounts</h1><button data-a="accAdd" aria-label="Add account"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Account</button></div><div id="accts-list">${list}</div></section>`
@@ -566,7 +569,7 @@ function catSheet({ title, kind, c, parent, s }) {
     S.cats.filter(x => x.parent_id === c.id).map(x => `<div class="row"><div class="n">${esc(x.name)}</div><button data-r="se" data-id="${x.id}">Edit</button><button data-r="sd" data-id="${x.id}" class="danger">Delete</button></div>`).join('') : ''
   o.innerHTML = `<div class="sheet"><h3>${esc(title)}</h3>
     <label>Name<input name="name" value="${esc(target?.name ?? '')}" autocomplete="off" aria-describedby="cerr"></label>
-    ${isSub ? '' : `<label>Ikon<select name="icon">${Object.entries(ICON_CHOICES).map(([k, [l]]) => `<option value="${k}"${(c?.icon || 'tag') === k ? ' selected' : ''}>${l}</option>`).join('')}</select></label>`}
+    ${isSub ? '' : `<label>Icon<select name="icon">${Object.entries(ICON_CHOICES).map(([k, [l]]) => `<option value="${k}"${(c?.icon || 'tag') === k ? ' selected' : ''}>${l}</option>`).join('')}</select></label>`}
     ${showBudget ? `<label>Monthly budget (Rp)<input name="budget" type="number" inputmode="numeric" value="${esc(c?.monthly_budget ?? 0)}"></label>` : ''}
     <div class="err" id="cerr" role="alert"></div>${subsHtml}
     <div class="btns"><button data-r="x">Cancel</button>${target ? '<button data-r="d" class="danger">Delete</button>' : ''}<button data-r="s" class="pri">Save</button></div></div>`
